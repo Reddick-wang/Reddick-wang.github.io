@@ -1,0 +1,863 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="iOS," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="NSLock锁，通常被用来协调多线程中访问操作，可用于协调访问应用程序的全局数据或保护代码的关键部分的原子性操作。 APINSLock的API很少，只有两个方法和一个属性,同时遵循协议NSLocking 123456/* 尝试进行加锁，如果加锁成功会返回`YES`,反之会返回`NO`。*／- (BOOL)tryLock;／*该方法会在给定的时间进行加锁操作，如果执行成功返回`YES`*／- (BO">
+<meta name="keywords" content="iOS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS中的那些锁">
+<meta property="og:url" content="http://yoursite.com/2017/05/12/iOS-iOS中的那些锁/index.html">
+<meta property="og:site_name" content="Reddick">
+<meta property="og:description" content="NSLock锁，通常被用来协调多线程中访问操作，可用于协调访问应用程序的全局数据或保护代码的关键部分的原子性操作。 APINSLock的API很少，只有两个方法和一个属性,同时遵循协议NSLocking 123456/* 尝试进行加锁，如果加锁成功会返回`YES`,反之会返回`NO`。*／- (BOOL)tryLock;／*该方法会在给定的时间进行加锁操作，如果执行成功返回`YES`*／- (BO">
+<meta property="og:updated_time" content="2017-06-20T10:02:51.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="iOS中的那些锁">
+<meta name="twitter:description" content="NSLock锁，通常被用来协调多线程中访问操作，可用于协调访问应用程序的全局数据或保护代码的关键部分的原子性操作。 APINSLock的API很少，只有两个方法和一个属性,同时遵循协议NSLocking 123456/* 尝试进行加锁，如果加锁成功会返回`YES`,反之会返回`NO`。*／- (BOOL)tryLock;／*该方法会在给定的时间进行加锁操作，如果执行成功返回`YES`*／- (BO">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"hide","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/05/12/iOS-iOS中的那些锁/"/>
+
+
+
+
+
+  <title>iOS中的那些锁 | Reddick</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Reddick</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/05/12/iOS-iOS中的那些锁/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Reddick">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Reddick">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">iOS中的那些锁</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-12T16:04:56+08:00">
+                2017-05-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2017/05/12/iOS-iOS中的那些锁/" class="leancloud_visitors" data-flag-title="iOS中的那些锁">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="NSLock"><a href="#NSLock" class="headerlink" title="NSLock"></a>NSLock</h3><p>锁，通常被用来协调多线程中访问操作，可用于协调访问应用程序的全局数据或保护代码的关键部分的原子性操作。</p>
+<h4 id="API"><a href="#API" class="headerlink" title="API"></a>API</h4><p>NSLock的API很少，只有两个方法和一个属性,同时遵循协议<code>NSLocking</code></p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/* 尝试进行加锁，如果加锁成功会返回`YES`,反之会返回`NO`。*／</span></div><div class="line">- (BOOL)tryLock;</div><div class="line">／*该方法会在给定的时间进行加锁操作，如果执行成功返回`YES`*／</div><div class="line">- (BOOL)lockBeforeDate:(NSDate *)limit;</div><div class="line"></div><div class="line">@property (nullable, copy) NSString *name</div></pre></td></tr></table></figure>
+<p>NSLock类底层使用POSIX线程实现了所行为，在执行解锁<code>unlock</code>方法前需要确保在相同线程中进行过加锁<code>lock/tryLock</code>操作。在不同的线程中加解锁会导致不确定的行为。加锁和解锁需要成对出现，并且在解锁之前不可以进行再次加锁，这种情况可能会导致deadlock,在实际运行的时候会出现类似这样的报错<code>-[NSLock lock]: deadlock (&lt;NSLock: 0x6000000c4830&gt; &#39;(null)&#39;)</code>。如果有递归调用方法的情况，可以考虑使用递归锁(后文介绍)。</p>
+<h4 id="简单示例"><a href="#简单示例" class="headerlink" title="简单示例"></a>简单示例</h4><figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">@property</span> (<span class="keyword">strong</span>,<span class="keyword">nonatomic</span>)<span class="built_in">NSLock</span> *lock;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">strong</span>,<span class="keyword">nonatomic</span>)<span class="built_in">NSMutableArray</span> *dataResult;</div><div class="line"></div><div class="line">- (<span class="keyword">instancetype</span>)init &#123;</div><div class="line">    <span class="keyword">if</span> (<span class="keyword">self</span> = [<span class="keyword">super</span> init]) &#123;</div><div class="line">        _lock = [[<span class="built_in">NSLock</span> alloc] init];</div><div class="line">        _dataResult = [[<span class="built_in">NSMutableArray</span> alloc] init];</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="keyword">self</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (<span class="keyword">void</span>)push:(<span class="keyword">id</span>)obj &#123;</div><div class="line">    <span class="keyword">if</span> (obj != <span class="literal">NULL</span> &amp;&amp; [_lock tryLock]) &#123;</div><div class="line">        [_dataResult addObject:obj];</div><div class="line">        [_lock unlock];</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>通常情况下，只有写操作或者改变值操作进行加锁处理，而读取数据并不进行加锁，这样的操作可以提高运行效率。并且在此强调，加解锁的线程一定要保证唯一性。</p>
+<h3 id="synchronized"><a href="#synchronized" class="headerlink" title="@synchronized"></a>@synchronized</h3><p><code>synchronized</code>关键字是clang预定义的关键词，向synchronized中传入一个唯一的标识用来区分保护锁。<code>synchronized</code>不需要像NSLock一样要考虑在加解锁需要在同一线程中的问题，也不需要考虑同一个线程中连续加锁的问题。但是性能上却比NSLock要差一些，作为预处理方法，使用<code>synchronized</code>方法隐式的添加了一个异常处理块来保护代码，在异常触发的时候自动释放掉锁。</p>
+<h4 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h4><figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">- (<span class="keyword">void</span>)push:(<span class="keyword">id</span>)obj &#123;</div><div class="line">    <span class="keyword">@synchronized</span> (<span class="keyword">self</span>) &#123;</div><div class="line">        [_dataResult addObject:obj];</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="延伸"><a href="#延伸" class="headerlink" title="延伸"></a>延伸</h4><p>@synchronized方法中究竟做了什么？我们不妨可以通过将Objective-C代码片段转化为C代码来一探究竟。<br>编写一个使用了<code>@synchronized</code>的方法示例</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">LockObj</span> ()</span></div><div class="line"><span class="keyword">@property</span> (<span class="keyword">strong</span>,<span class="keyword">nonatomic</span>)<span class="built_in">NSMutableArray</span> *dataResult;</div><div class="line"><span class="keyword">@end</span></div><div class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">LockObj</span></span></div><div class="line">- (<span class="keyword">instancetype</span>)init &#123;</div><div class="line">    <span class="keyword">if</span> (<span class="keyword">self</span> = [<span class="keyword">super</span> init]) &#123;</div><div class="line"></div><div class="line">        _dataResult = [[<span class="built_in">NSMutableArray</span> alloc] init];</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="keyword">self</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (<span class="keyword">void</span>)push:(<span class="keyword">id</span>)obj &#123;</div><div class="line">    <span class="keyword">@synchronized</span> (<span class="keyword">self</span>) &#123;</div><div class="line">        [_dataResult addObject:obj];</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"><span class="keyword">@end</span></div></pre></td></tr></table></figure>
+<p>接下来使用<code>clang -rewrite-objc</code>命令将Objective-C代码转化为C/C++代码。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">clang -rewrite-objc LockObj.m -o lock.output</div></pre></td></tr></table></figure>
+<p>查看lock.output文件，会找到下面的代码</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">static</span> <span class="keyword">void</span> _I_LockObj_push_(LockObj * self, SEL _cmd, id obj) &#123;</div><div class="line">    &#123; id _rethrow = <span class="number">0</span>; id _sync_obj = (id)self; objc_sync_enter(_sync_obj);</div><div class="line"><span class="keyword">try</span> &#123;</div><div class="line">    <span class="class"><span class="keyword">struct</span> _<span class="title">SYNC_EXIT</span> &#123;</span> _SYNC_EXIT(id arg) : sync_exit(arg) &#123;&#125;</div><div class="line">    ~_SYNC_EXIT() &#123;objc_sync_exit(sync_exit);&#125;</div><div class="line">    id sync_exit;</div><div class="line">    &#125; _sync_exit(_sync_obj);</div><div class="line"></div><div class="line">        ((<span class="keyword">void</span> (*)(id, SEL, ObjectType))(<span class="keyword">void</span> *)objc_msgSend)((id)(*(NSMutableArray **)((<span class="keyword">char</span> *)self + OBJC_IVAR_$_LockObj$_dataResult)), sel_registerName(<span class="string">"addObject:"</span>), (id)obj);</div><div class="line">    &#125; <span class="keyword">catch</span> (id e) &#123;_rethrow = e;&#125;</div><div class="line">&#123; <span class="class"><span class="keyword">struct</span> _<span class="title">FIN</span> &#123;</span> _FIN(id reth) : rethrow(reth) &#123;&#125;</div><div class="line">    ~_FIN() &#123; <span class="keyword">if</span> (rethrow) objc_exception_throw(rethrow); &#125;</div><div class="line">    id rethrow;</div><div class="line">    &#125; _fin_force_rethow(_rethrow);&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>可以发现<code>@synchronized</code>方法其实是调用了类似如下的代码</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">    <span class="keyword">id</span> _rethrow = <span class="number">0</span>;</div><div class="line">    <span class="keyword">id</span> _sync_obj = (<span class="keyword">id</span>)<span class="keyword">self</span>;</div><div class="line">    objc_sync_enter(_sync_obj);</div><div class="line">    <span class="keyword">id</span> sync_exit;</div><div class="line">    <span class="keyword">@try</span> &#123;</div><div class="line">       <span class="comment">//dosomethong</span></div><div class="line">    &#125; <span class="keyword">@catch</span> (<span class="built_in">NSException</span> *exp) &#123;</div><div class="line">        objc_exception_throw(exp);</div><div class="line">    &#125; <span class="keyword">@finally</span> &#123;</div><div class="line">        objc_sync_exit(sync_exit);</div><div class="line">    &#125;</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
+<p><code>objc_sync_enter</code>和<code>objc_sync_exit</code>是定义在<code>&lt;objc/objc-sync.h&gt;</code>文件中的。其注释已经明确的告诉了我们想知道的：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * Begin synchronizing on 'obj'.  </div><div class="line"> * Allocates recursive pthread_mutex associated with 'obj' if needed.</div><div class="line"> *</div><div class="line"> * @param obj The object to begin synchronizing on.</div><div class="line"> *</div><div class="line"> * @return OBJC_SYNC_SUCCESS once lock is acquired.  </div><div class="line"> */</div><div class="line"> OBJC_EXPORT  <span class="keyword">int</span> objc_sync_enter(<span class="keyword">id</span> obj)</div><div class="line">OBJC_AVAILABLE(<span class="number">10.3</span>, <span class="number">2.0</span>, <span class="number">9.0</span>, <span class="number">1.0</span>);</div><div class="line"></div><div class="line"><span class="comment">/**</span></div><div class="line"> * End synchronizing on 'obj'.</div><div class="line"> *</div><div class="line"> * @param obj The objet to end synchronizing on.</div><div class="line"> *</div><div class="line"> * @return OBJC_SYNC_SUCCESS or OBJC_SYNC_NOT_OWNING_THREAD_ERROR</div><div class="line"> */</div><div class="line">OBJC_EXPORT  <span class="keyword">int</span> objc_sync_exit(<span class="keyword">id</span> obj)</div><div class="line">    OBJC_AVAILABLE(<span class="number">10.3</span>, <span class="number">2.0</span>, <span class="number">9.0</span>, <span class="number">1.0</span>);</div></pre></td></tr></table></figure>
+<p>没错，@synchronized创建的是<code>PTHREAD_MUTEX_RECURSIVE</code>类型的互斥锁。</p>
+<h3 id="NSConditionLock"><a href="#NSConditionLock" class="headerlink" title="NSConditionLock"></a>NSConditionLock</h3><p>条件锁，顾名思义，就是在某些条件下才进入线程执行代码，其余条件进入等待状态，等待条件的线程会被阻塞住直到另一个线程中显示的发出信号。其与互斥锁有一些微妙的区别。。其底层基于POSIX线程机制的。</p>
+<h4 id="API-1"><a href="#API-1" class="headerlink" title="API"></a>API</h4><figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">- (<span class="keyword">instancetype</span>)initWithCondition:(<span class="built_in">NSInteger</span>)condition;</div><div class="line"></div><div class="line"><span class="keyword">@property</span> (<span class="keyword">readonly</span>) <span class="built_in">NSInteger</span> condition;</div><div class="line">- (<span class="keyword">void</span>)lockWhenCondition:(<span class="built_in">NSInteger</span>)condition;</div><div class="line">- (<span class="built_in">BOOL</span>)tryLock;</div><div class="line">- (<span class="built_in">BOOL</span>)tryLockWhenCondition:(<span class="built_in">NSInteger</span>)condition;</div><div class="line">- (<span class="keyword">void</span>)unlockWithCondition:(<span class="built_in">NSInteger</span>)condition;</div><div class="line">- (<span class="built_in">BOOL</span>)lockBeforeDate:(<span class="built_in">NSDate</span> *)limit;</div><div class="line">- (<span class="built_in">BOOL</span>)lockWhenCondition:(<span class="built_in">NSInteger</span>)condition beforeDate:(<span class="built_in">NSDate</span> *)limit;</div></pre></td></tr></table></figure>
+<p><code>initWithCondition</code>会创建一个条件锁，并设置condition时进行加锁，未解锁前其他线程将会暂停等待。<br><code>lockWhenCondition</code>将条件锁的加锁条件设置为某值，之前设置的值会被丢弃，未解锁前其他线程将会暂停等待。<br>其他使用方法类似，这里不做过多解释了。</p>
+<p>条件锁最常使用的环境是生产-消费模式，生产者和消费者各自在一个线程。生产者生产数据并将数据放入到队列中，在没有数据时会加锁执行生产。消费者消费数据并将数据移出队列，在有数据时会加锁，消费完成后如果没有数据，则解锁并设置锁条件为无数据。</p>
+<h4 id="Apple官方的代码"><a href="#Apple官方的代码" class="headerlink" title="Apple官方的代码"></a>Apple官方的代码</h4><figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//生产者</span></div><div class="line"><span class="keyword">id</span> condLock = [[<span class="built_in">NSConditionLock</span> alloc] initWithCondition: NO_DATA];</div><div class="line"></div><div class="line"><span class="keyword">while</span>(<span class="literal">true</span>)</div><div class="line">&#123;</div><div class="line">    [condLock lock];</div><div class="line">    <span class="comment">/* Add data to the queue. */</span></div><div class="line">    [condLock unlockWithCondition: HAS_DATA];</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">//消费者</span></div><div class="line"><span class="keyword">while</span> (<span class="literal">true</span>)</div><div class="line">&#123;</div><div class="line">    [condLock lockWhenCondition: HAS_DATA];</div><div class="line">    <span class="comment">/* Remove data from the queue. */</span></div><div class="line">    [condLock unlockWithCondition:(isEmpty ? NO_DATA : HAS_DATA)];</div><div class="line"></div><div class="line">    <span class="comment">// Process the data locally.</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="NSCondition"><a href="#NSCondition" class="headerlink" title="NSCondition"></a>NSCondition</h3><p>条件，虽然带锁的名字，但是其也遵循<code>NSLocking</code>协议。当NSCondition加锁后，其他线程调用wait方法进入等待状态，直到signal触发会唤醒某一个或者bradcast唤起所有。</p>
+<h4 id="API-2"><a href="#API-2" class="headerlink" title="API"></a>API</h4><figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">- (<span class="keyword">void</span>)wait;</div><div class="line">- (<span class="built_in">BOOL</span>)waitUntilDate:(<span class="built_in">NSDate</span> *)limit;</div><div class="line">- (<span class="keyword">void</span>)signal;</div><div class="line">- (<span class="keyword">void</span>)broadcast;</div></pre></td></tr></table></figure>
+<p><code>signal</code>方法可以唤醒线程，<code>broadcast</code>可以唤醒所有等待线程。</p>
+<h3 id="NSRecursiveLock"><a href="#NSRecursiveLock" class="headerlink" title="NSRecursiveLock"></a><a href="#NSRecursiveLock" title="NSRecursiveLock"></a>NSRecursiveLock</h3><p>递归锁，递归锁的出现大概是因为NSLock无法处理统一线程中多次调用加锁或是递归调用引起的<code>deadlock</code>问题，递归锁虽然不会因为多次调用加锁而引起死锁，但是仍然要保证加锁与解锁成对出现。</p>
+<h4 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a><a href="#示例-1" title="示例"></a>示例</h4><figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">- (<span class="keyword">void</span>)recurveLock:(<span class="built_in">NSInteger</span>) result &#123;</div><div class="line">    [_lock lock];</div><div class="line">    <span class="keyword">if</span> (result &gt; <span class="number">0</span>) &#123; [<span class="keyword">self</span> recurveLock:result<span class="number">-1</span>];&#125;</div><div class="line">    [_lock unlock];</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="NSDistributedLock"><a href="#NSDistributedLock" class="headerlink" title="NSDistributedLock"></a>NSDistributedLock</h3><p>分布锁，该锁的主要用途是多线程/进程之间需要限制对某些共享资源的访问，比如一个文件。<br>分布锁没有实现NSLocking协议，所以没有lock方法。一个lock方法将会阻塞线程的执行，并要求系统以预定的速度轮询锁。<br>它提供了一个tryLock方法，并让你决定是否轮询。访问结束后，可以通过调用unlock方法来释放它。</p>
+<h4 id="API-3"><a href="#API-3" class="headerlink" title="API"></a>API</h4><figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">+ (<span class="keyword">nullable</span> <span class="built_in">NSDistributedLock</span> *)lockWithPath:(<span class="built_in">NSString</span> *)path;  </div><div class="line"></div><div class="line">- (<span class="keyword">instancetype</span>)init <span class="built_in">NS_UNAVAILABLE</span>;</div><div class="line">- (<span class="keyword">nullable</span> <span class="keyword">instancetype</span>)initWithPath:(<span class="built_in">NSString</span> *)path <span class="built_in">NS_DESIGNATED_INITIALIZER</span>;</div><div class="line"></div><div class="line">- (<span class="built_in">BOOL</span>)tryLock;</div><div class="line">- (<span class="keyword">void</span>)unlock;</div><div class="line">- (<span class="keyword">void</span>)breakLock;</div></pre></td></tr></table></figure>
+<h3 id="OSSpinLock"><a href="#OSSpinLock" class="headerlink" title="OSSpinLock"></a>OSSpinLock</h3><p>自旋锁，可以理解为比NSLock更底层的锁，同样处理资源竞争的问题，性能高于NSLock和pthread_mutex。</p>
+<h4 id="API-4"><a href="#API-4" class="headerlink" title="API"></a>API</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">bool</span>    <span class="title">OSSpinLockTry</span><span class="params">( <span class="keyword">volatile</span> OSSpinLock *__lock )</span></span>;</div><div class="line"><span class="function"><span class="keyword">void</span>    <span class="title">OSSpinLockLock</span><span class="params">( <span class="keyword">volatile</span> OSSpinLock *__lock )</span></span>;</div><div class="line"><span class="function"><span class="keyword">void</span>    <span class="title">OSSpinLockUnlock</span><span class="params">( <span class="keyword">volatile</span> OSSpinLock *__lock )</span></span></div></pre></td></tr></table></figure>
+<p>使用方式与NSLock类似，并无很大区别。</p>
+<h4 id="示例-2"><a href="#示例-2" class="headerlink" title="示例"></a>示例</h4><figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">__block OSSpinLock lock = OS_SPINLOCK_INIT;</div><div class="line"></div><div class="line"><span class="built_in">dispatch_async</span>(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, <span class="number">0</span>), ^&#123;</div><div class="line"></div><div class="line">    OSSpinLockLock(&amp;lock);</div><div class="line">    <span class="comment">//do something</span></div><div class="line">    OSSpinLockUnlock(&amp;oslock);</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<h4 id="不再安全的OSSpinLock"><a href="#不再安全的OSSpinLock" class="headerlink" title="不再安全的OSSpinLock"></a>不再安全的OSSpinLock</h4><p>OSSpinLock已经被废弃掉了，原因是低优先级的线程如果锁住了资源，高优先级的线程访问时会破坏掉锁的资源，具体看这里<a href="http://blog.ibireme.com/2016/01/16/spinlock_is_unsafe_in_ios/" target="_blank" rel="external">不再安全的 OSSpinLock</a><br>鉴于OSSpinLock会有bug的问题，Apple在iOS10.0/MacOS 10.12中使用了新的方式实现了自旋锁<code>os_unfair_lock_s</code>，同时废弃掉了OSSpinLock。</p>
+<h4 id="os-unfair-lock"><a href="#os-unfair-lock" class="headerlink" title="os_unfair_lock"></a>os_unfair_lock</h4><p><code>os_unfair_lock</code>是替代OSSpinLock的产物，在Xcode8之后可以看到OSSpinLock已经被废弃掉，并用os_unfair_lock代替了。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#define OS_SPINLOCK_INIT 0</span></div><div class="line"><span class="keyword">typedef</span> int32_t OSSpinLock OSSPINLOCK_DEPRECATED_REPLACE_WITH(os_unfair_lock);</div><div class="line"><span class="keyword">typedef</span> <span class="keyword">volatile</span> OSSpinLock *_os_nospin_lock_t;</div><div class="line"></div><div class="line">OSSPINLOCK_DEPRECATED_REPLACE_WITH(os_unfair_lock_lock)</div><div class="line">OS_NOSPIN_LOCK_AVAILABILITY</div><div class="line"><span class="keyword">void</span> _os_nospin_lock_lock(_os_nospin_lock_t lock);</div><div class="line"><span class="meta">#undef OSSpinLockLock</span></div><div class="line"><span class="meta">#define OSSpinLockLock(lock) _os_nospin_lock_lock(lock)</span></div><div class="line"></div><div class="line">OSSPINLOCK_DEPRECATED_REPLACE_WITH(os_unfair_lock_trylock)</div><div class="line">OS_NOSPIN_LOCK_AVAILABILITY</div><div class="line"><span class="keyword">bool</span> _os_nospin_lock_trylock(_os_nospin_lock_t lock);</div><div class="line"><span class="meta">#undef OSSpinLockTry</span></div><div class="line"><span class="meta">#define OSSpinLockTry(lock) _os_nospin_lock_trylock(lock)</span></div><div class="line"></div><div class="line">OSSPINLOCK_DEPRECATED_REPLACE_WITH(os_unfair_lock_unlock)</div><div class="line">OS_NOSPIN_LOCK_AVAILABILITY</div><div class="line"><span class="keyword">void</span> _os_nospin_lock_unlock(_os_nospin_lock_t lock);</div><div class="line"><span class="meta">#undef OSSpinLockUnlock</span></div><div class="line"><span class="meta">#define OSSpinLockUnlock(lock) _os_nospin_lock_unlock(lock)</span></div></pre></td></tr></table></figure>
+<p>使用<code>os_unfair_lock</code>的方法于<code>OSSpinLock</code>的方式类似，示例如下：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">os_unfair_lock lock = OS_UNFAIR_LOCK_INIT;</div><div class="line">os_unfair_lock_lock(&amp;lock);</div><div class="line"><span class="comment">//do something</span></div><div class="line">os_unfair_lock_unlock(&amp;lock);</div></pre></td></tr></table></figure>
+<h3 id="性能对比"><a href="#性能对比" class="headerlink" title="性能对比"></a>性能对比</h3><p>关于锁的性能评测，很多开发者已经给出了测试结果，基本上是<code>os_unfair_lock &gt; OSSpinLockLock &gt; DispatchSemaphare &gt; pthread_mutex_t &gt; NSLock &gt; @synchronized</code></p>
+<p>pspdfkit作者给出的<a href="https://gist.github.com/steipete/36350a8a60693d440954b95ea6cbbafc" target="_blank" rel="external">测试结果</a>;</p>
+<p>国人给出的测试结果：<a href="http://ksnowlv.github.io/blog/2014/09/07/ios-tong-bu-suo-xing-neng-dui-bi/" target="_blank" rel="external">同步锁性能对比</a></p>
+<h3 id="mutex-vs-Binary-semaphore"><a href="#mutex-vs-Binary-semaphore" class="headerlink" title="mutex vs Binary semaphore"></a>mutex vs Binary semaphore</h3><p>很多人对锁和信号的概念有一些误区，他们不是同一码事。两者的使用有不同的目的。互斥锁的仅允许一个线程访问锁定的部分，而互斥信号量不同，允许多个进程／线程访问，但同时只能有一个。具体可以参考这里<a href="http://stackoverflow.com/questions/62814/difference-between-binary-semaphore-and-mutex/346678#346678" target="_blank" rel="external">difference-between-binary-semaphore-and-mutex</a></p>
+<h3 id="延伸阅读"><a href="#延伸阅读" class="headerlink" title="延伸阅读"></a>延伸阅读</h3><p><a href="http://yulingtianxia.com/blog/2015/11/01/More-than-you-want-to-know-about-synchronized/" target="_blank" rel="external">关于 @synchronized，这儿比你想知道的还要多</a> By 杨萧玉</p>
+<p><a href="https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/Multithreading/ThreadSafety/ThreadSafety.html#//apple_ref/doc/uid/10000057i-CH8-SW3" target="_blank" rel="external">Threading Programming Guide/Synchronization</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS/" rel="tag"># iOS</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/08/iOS-饿了么下拉刷新效果的实现/" rel="next" title="饿了么下拉刷新效果的实现(二)">
+                <i class="fa fa-chevron-left"></i> 饿了么下拉刷新效果的实现(二)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/05/17/Android-Studio中的快捷键-Mac/" rel="prev" title="Android-Studio中的快捷键(Mac)">
+                Android-Studio中的快捷键(Mac) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="Reddick" />
+          <p class="site-author-name" itemprop="name">Reddick</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">50</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#NSLock"><span class="nav-number">1.</span> <span class="nav-text">NSLock</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#API"><span class="nav-number">1.1.</span> <span class="nav-text">API</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#简单示例"><span class="nav-number">1.2.</span> <span class="nav-text">简单示例</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#synchronized"><span class="nav-number">2.</span> <span class="nav-text">@synchronized</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#示例"><span class="nav-number">2.1.</span> <span class="nav-text">示例</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#延伸"><span class="nav-number">2.2.</span> <span class="nav-text">延伸</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NSConditionLock"><span class="nav-number">3.</span> <span class="nav-text">NSConditionLock</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#API-1"><span class="nav-number">3.1.</span> <span class="nav-text">API</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Apple官方的代码"><span class="nav-number">3.2.</span> <span class="nav-text">Apple官方的代码</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NSCondition"><span class="nav-number">4.</span> <span class="nav-text">NSCondition</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#API-2"><span class="nav-number">4.1.</span> <span class="nav-text">API</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NSRecursiveLock"><span class="nav-number">5.</span> <span class="nav-text">NSRecursiveLock</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#示例-1"><span class="nav-number">5.1.</span> <span class="nav-text">示例</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NSDistributedLock"><span class="nav-number">6.</span> <span class="nav-text">NSDistributedLock</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#API-3"><span class="nav-number">6.1.</span> <span class="nav-text">API</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#OSSpinLock"><span class="nav-number">7.</span> <span class="nav-text">OSSpinLock</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#API-4"><span class="nav-number">7.1.</span> <span class="nav-text">API</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#示例-2"><span class="nav-number">7.2.</span> <span class="nav-text">示例</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#不再安全的OSSpinLock"><span class="nav-number">7.3.</span> <span class="nav-text">不再安全的OSSpinLock</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#os-unfair-lock"><span class="nav-number">7.4.</span> <span class="nav-text">os_unfair_lock</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#性能对比"><span class="nav-number">8.</span> <span class="nav-text">性能对比</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mutex-vs-Binary-semaphore"><span class="nav-number">9.</span> <span class="nav-text">mutex vs Binary semaphore</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#延伸阅读"><span class="nav-number">10.</span> <span class="nav-text">延伸阅读</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Reddick</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("Ol4oMp1FneQ7gWrMKhYQLsFq-gzGzoHsz", "H57pffrWdrCIfFwrTaa4lwln");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

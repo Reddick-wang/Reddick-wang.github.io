@@ -1,0 +1,834 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="iOS," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="概述在iOS中实现回调的方法大概有以下几种：  协议代理 通知中心 匿名函数 KVO键值观察  在使用中，一对一的回调以上四种都可以实现，而对于一对多，范围大的回调，一般都会采用通知中心。 然而苹果的通知中心的实现在多线程编程时是有问题的，即通知的接收者所接收的通知有可能并不是在发出通知的线程上，这便导致了如果此时对象在执行dealloc的时候仍会接收到通知的问题。 在使用环信SDK的时候，我们常">
+<meta name="keywords" content="iOS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS多播代理 (一)">
+<meta property="og:url" content="http://yoursite.com/2016/02/16/iOS-mutiple-delegates-leaning/index.html">
+<meta property="og:site_name" content="Reddick">
+<meta property="og:description" content="概述在iOS中实现回调的方法大概有以下几种：  协议代理 通知中心 匿名函数 KVO键值观察  在使用中，一对一的回调以上四种都可以实现，而对于一对多，范围大的回调，一般都会采用通知中心。 然而苹果的通知中心的实现在多线程编程时是有问题的，即通知的接收者所接收的通知有可能并不是在发出通知的线程上，这便导致了如果此时对象在执行dealloc的时候仍会接收到通知的问题。 在使用环信SDK的时候，我们常">
+<meta property="og:updated_time" content="2017-06-19T10:47:14.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="iOS多播代理 (一)">
+<meta name="twitter:description" content="概述在iOS中实现回调的方法大概有以下几种：  协议代理 通知中心 匿名函数 KVO键值观察  在使用中，一对一的回调以上四种都可以实现，而对于一对多，范围大的回调，一般都会采用通知中心。 然而苹果的通知中心的实现在多线程编程时是有问题的，即通知的接收者所接收的通知有可能并不是在发出通知的线程上，这便导致了如果此时对象在执行dealloc的时候仍会接收到通知的问题。 在使用环信SDK的时候，我们常">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"hide","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/02/16/iOS-mutiple-delegates-leaning/"/>
+
+
+
+
+
+  <title>iOS多播代理 (一) | Reddick</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Reddick</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/02/16/iOS-mutiple-delegates-leaning/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Reddick">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Reddick">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">iOS多播代理 (一)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-02-16T19:07:43+08:00">
+                2016-02-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2016/02/16/iOS-mutiple-delegates-leaning/" class="leancloud_visitors" data-flag-title="iOS多播代理 (一)">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>在iOS中实现回调的方法大概有以下几种：</p>
+<ul>
+<li>协议代理</li>
+<li>通知中心</li>
+<li>匿名函数</li>
+<li>KVO键值观察</li>
+</ul>
+<p>在使用中，一对一的回调以上四种都可以实现，而对于一对多，范围大的回调，一般都会采用通知中心。 然而苹果的通知中心的实现在多线程编程时是有问题的，即通知的接收者所接收的通知有可能并不是在发出通知的线程上，这便导致了如果此时对象在执行dealloc的时候仍会接收到通知的问题。 在使用环信SDK的时候，我们常常会看到这样的代码：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">- (<span class="keyword">void</span>)registerEaseMobNotification&#123;</div><div class="line">    [<span class="keyword">self</span> unRegisterEaseMobNotification];</div><div class="line">    <span class="comment">// 将self 添加到SDK回调中，以便本类可以收到SDK回调</span></div><div class="line">    [[EaseMob sharedInstance].chatManager addDelegate:<span class="keyword">self</span> delegateQueue:<span class="literal">nil</span>];</div><div class="line">&#125;</div><div class="line">- (<span class="keyword">void</span>)unRegisterEaseMobNotification&#123;</div><div class="line">    [[EaseMob sharedInstance].chatManager removeDelegate:<span class="keyword">self</span>];</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>在使用时，我们会向<code>chatmanager</code>添加多个代理，然后每个代理都会接收到回调方法。普通的delegate只能是一对一的回调，无法做到一对多的回调。而多播代理正是对单一代理模式的一种扩展和延伸，多播代理的注册和取消注册都是成对出现的。那么如何实现一个多播代理呢？其实在<code>XMPPFramework</code>中已经写好了一个可用多播代理类GCDMulticastDelegate，而我们只需要拿出来直接用就可以了。由于GCDMulticastDelegate是在MRC下实现的，所以需要添加<code>-fno-objc-arc</code>来确保编译器可以在MRC下编译，同时由于.h文件中ARC下已经不允许在结构体内使用id类型的结构体了，所以我们将结构体改为如下形式。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">struct</span> GCDMulticastDelegateListNode &#123;</div><div class="line">    __<span class="keyword">unsafe_unretained</span> <span class="keyword">id</span> delegate;</div><div class="line">    __<span class="keyword">unsafe_unretained</span> <span class="built_in">dispatch_queue_t</span> delegateQueue;</div><div class="line">    <span class="keyword">struct</span> GCDMulticastDelegateListNode * prev;</div><div class="line">    <span class="keyword">struct</span> GCDMulticastDelegateListNode * next;</div><div class="line">    int32_t retainCount;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>在实现上，多播代理其实利用了iOS伪继承和消息转发机制，就是当类本身处理不了某些方法时去转发消息给其他类做处理。转发的关键步骤在这里：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line">- (<span class="keyword">void</span>)forwardInvocation:(<span class="built_in">NSInvocation</span> *)origInvocation</div><div class="line">&#123;</div><div class="line">    <span class="built_in">NSAutoreleasePool</span> *pool = [[<span class="built_in">NSAutoreleasePool</span> alloc] init];</div><div class="line">    <span class="comment">// All delegates MUST be invoked ASYNCHRONOUSLY.</span></div><div class="line">    GCDMulticastDelegateListNode *node = delegateList;</div><div class="line">    <span class="keyword">if</span> (node != <span class="literal">NULL</span>)</div><div class="line">    &#123;</div><div class="line">        <span class="comment">// Recall that new delegates are added to the beginning of the linked list.</span></div><div class="line">        <span class="comment">// The last delegate in the list is the first delegate that was added, so it will be the first that's invoked.</span></div><div class="line">        <span class="comment">// We're going to be moving backwards through the linked list as we invoke the delegates.</span></div><div class="line">        <span class="comment">//</span></div><div class="line">        <span class="comment">// Loop through the linked list so we can get a reference to the last delegate in the list.</span></div><div class="line">        <span class="keyword">while</span> (node-&gt;next != <span class="literal">NULL</span>)</div><div class="line">        &#123;</div><div class="line">            node = node-&gt;next;</div><div class="line">        &#125;</div><div class="line">        SEL selector = [origInvocation selector];</div><div class="line">        <span class="keyword">while</span> (node != <span class="literal">NULL</span>)</div><div class="line">        &#123;</div><div class="line">            <span class="keyword">id</span> delegate = node-&gt;delegate;</div><div class="line">            <span class="keyword">if</span> ([delegate respondsToSelector:selector])</div><div class="line">            &#123;</div><div class="line">                <span class="built_in">NSInvocation</span> *dupInvocation = [<span class="keyword">self</span> duplicateInvocation:origInvocation];</div><div class="line">                <span class="built_in">dispatch_async</span>(node-&gt;delegateQueue, ^&#123;</div><div class="line">                    <span class="built_in">NSAutoreleasePool</span> *delegatePool = [[<span class="built_in">NSAutoreleasePool</span> alloc] init];</div><div class="line">                    [dupInvocation invokeWithTarget:delegate];</div><div class="line">                    [delegatePool drain];</div><div class="line">                &#125;);</div><div class="line">            &#125;</div><div class="line">            node = node-&gt;prev;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    [pool release];</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>该方法是NSObject拥有，NSObject类内部实现只是调用了-(void)doesNotRecognizeSelector:(SEL)aSelector;方法，运行时系统在对象无法处理或转发一个消息时会调用这个方法。这个方法引发一个NSInvalidArgumentException异常并生成一个错误消息。而这里则是向每个代理转发消息。消息转发关键是重写了- (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector方法，该方法是在向对象发送不能处理的消息的时候调用的。在代理能响应方法时会调用方法，如果代理并未响应方法，则会调用doNothing方法（即什么也不做)。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div></pre></td><td class="code"><pre><div class="line">- (<span class="built_in">NSMethodSignature</span> *)methodSignatureForSelector:(SEL)aSelector</div><div class="line">&#123;</div><div class="line">    GCDMulticastDelegateListNode *node;</div><div class="line">    <span class="keyword">for</span> (node = delegateList; node != <span class="literal">NULL</span>; node = node-&gt;next)</div><div class="line">    &#123;</div><div class="line">        <span class="built_in">NSMethodSignature</span> *result = [node-&gt;delegate methodSignatureForSelector:aSelector];</div><div class="line">        <span class="keyword">if</span> (result != <span class="literal">nil</span>)</div><div class="line">        &#123;</div><div class="line">            <span class="keyword">return</span> result;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="comment">// This causes a crash...</span></div><div class="line">    <span class="comment">// return [super methodSignatureForSelector:aSelector];</span></div><div class="line">    <span class="comment">// This also causes a crash...</span></div><div class="line">    <span class="comment">// return nil;</span></div><div class="line">    <span class="keyword">return</span> [[<span class="keyword">self</span> <span class="keyword">class</span>] instanceMethodSignatureForSelector:<span class="keyword">@selector</span>(doNothing)];</div><div class="line">&#125;</div><div class="line">下面以一个登录的多播代理为例，在名字改变时转发该消息。</div><div class="line"><span class="class"><span class="keyword">@protocol</span> <span class="title">LoginDelegate</span> &lt;<span class="title">NSObject</span>&gt;</span></div><div class="line"><span class="keyword">@optional</span></div><div class="line">- (<span class="keyword">void</span>)loginDidChange:(<span class="built_in">NSString</span> *)userName;</div><div class="line"><span class="keyword">@end</span></div><div class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">LoginManager</span> : <span class="title">NSObject</span></span>&#123;</div><div class="line">&#125;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">copy</span>)<span class="built_in">NSString</span> *userName;</div><div class="line">- (<span class="keyword">void</span>)addDelegate:(<span class="keyword">id</span>&lt;LoginDelegate&gt;)obj onQueue:(<span class="built_in">dispatch_queue_t</span>)queue;</div><div class="line">- (<span class="keyword">void</span>)removeDelegate:(<span class="keyword">id</span>)obj;</div><div class="line"><span class="keyword">@end</span></div><div class="line"><span class="keyword">static</span> LoginManager *instance = <span class="literal">nil</span>;</div><div class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">LoginManager</span> ()</span></div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>)GCDMulticastDelegate *delegate;</div><div class="line"><span class="keyword">@end</span></div><div class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">LoginManager</span></span></div><div class="line">+ (<span class="keyword">instancetype</span>)instance &#123;</div><div class="line">    <span class="keyword">static</span> <span class="built_in">dispatch_once_t</span> onceToken;</div><div class="line">    <span class="built_in">dispatch_once</span>(&amp;onceToken, ^&#123;</div><div class="line">        instance = [[<span class="keyword">self</span> alloc]init];</div><div class="line">    &#125;);</div><div class="line">    <span class="keyword">return</span> instance;</div><div class="line">&#125;</div><div class="line">- (<span class="keyword">instancetype</span>)init &#123;</div><div class="line">    <span class="keyword">if</span> (<span class="keyword">self</span> = [<span class="keyword">super</span> init]) &#123;</div><div class="line">        _delegate = [[GCDMulticastDelegate alloc]init];</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="keyword">self</span>;</div><div class="line">&#125;</div><div class="line">- (<span class="keyword">void</span>)setUserName:(<span class="built_in">NSString</span> *)userName &#123;</div><div class="line">    _userName = [userName <span class="keyword">copy</span>];</div><div class="line">    [(<span class="keyword">id</span> &lt;LoginDelegate&gt;)_delegate loginDidChange:userName];</div><div class="line">&#125;</div><div class="line">- (<span class="keyword">void</span>)addDelegate:(<span class="keyword">id</span>&lt;LoginDelegate&gt;)obj onQueue:(<span class="built_in">dispatch_queue_t</span>)queue &#123;</div><div class="line">    queue = queue ? :dispatch_get_main_queue();</div><div class="line">    [_delegate addDelegate:obj delegateQueue:queue];   </div><div class="line">&#125;</div><div class="line">- (<span class="keyword">void</span>)removeDelegate:(<span class="keyword">id</span>)obj &#123;</div><div class="line">    [_delegate removeDelegate:obj];</div><div class="line">&#125;</div><div class="line"><span class="keyword">@end</span></div></pre></td></tr></table></figure>
+<p>除了此种方法之外，还有另一种方式实现多播代理，会在另一篇文章中介绍。</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="http://www.cppblog.com/cokecoffe/archive/2012/05/23/175943.html" target="_blank" rel="external">伪继承与消息转发</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS/" rel="tag"># iOS</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/02/12/iOS-mutiple-thread-development-NSOperation/" rel="next" title="多线程开发（NSOperation篇）">
+                <i class="fa fa-chevron-left"></i> 多线程开发（NSOperation篇）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/02/16/iOS-mutiple-delegate-with-NSProxy/" rel="prev" title="iOS多播代理(二)">
+                iOS多播代理(二) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="Reddick" />
+          <p class="site-author-name" itemprop="name">Reddick</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">50</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考链接"><span class="nav-number">2.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Reddick</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("Ol4oMp1FneQ7gWrMKhYQLsFq-gzGzoHsz", "H57pffrWdrCIfFwrTaa4lwln");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

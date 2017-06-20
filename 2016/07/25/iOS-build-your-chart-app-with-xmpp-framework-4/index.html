@@ -1,0 +1,877 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="iOS,XMPP," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="概述XMPP提供了RFC 2779 定义的基本的即时消息和出席信息功能。XMPP的核心功能定义在XMPP CORE文档中（RFC3920），为各种类型的准实时消息应用提供了一个构造基础。 消息的类型消息的类型可以分为以下几类：  chat 消息是在一对一聊天会话的语境被发送. 一个兼容的客户端应该(SHOULD)在一个允许两个实体进行一对一聊天的界面中显示消息,包括适当的会话历史. error 发">
+<meta name="keywords" content="iOS,XMPP">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于XMPP实现简单的聊天功能(四)">
+<meta property="og:url" content="http://yoursite.com/2016/07/25/iOS-build-your-chart-app-with-xmpp-framework-4/index.html">
+<meta property="og:site_name" content="Reddick">
+<meta property="og:description" content="概述XMPP提供了RFC 2779 定义的基本的即时消息和出席信息功能。XMPP的核心功能定义在XMPP CORE文档中（RFC3920），为各种类型的准实时消息应用提供了一个构造基础。 消息的类型消息的类型可以分为以下几类：  chat 消息是在一对一聊天会话的语境被发送. 一个兼容的客户端应该(SHOULD)在一个允许两个实体进行一对一聊天的界面中显示消息,包括适当的会话历史. error 发">
+<meta property="og:image" content="http://7xq0yv.com1.z0.glb.clouddn.com/chat-sample.png">
+<meta property="og:updated_time" content="2017-06-20T08:37:36.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="基于XMPP实现简单的聊天功能(四)">
+<meta name="twitter:description" content="概述XMPP提供了RFC 2779 定义的基本的即时消息和出席信息功能。XMPP的核心功能定义在XMPP CORE文档中（RFC3920），为各种类型的准实时消息应用提供了一个构造基础。 消息的类型消息的类型可以分为以下几类：  chat 消息是在一对一聊天会话的语境被发送. 一个兼容的客户端应该(SHOULD)在一个允许两个实体进行一对一聊天的界面中显示消息,包括适当的会话历史. error 发">
+<meta name="twitter:image" content="http://7xq0yv.com1.z0.glb.clouddn.com/chat-sample.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"hide","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/07/25/iOS-build-your-chart-app-with-xmpp-framework-4/"/>
+
+
+
+
+
+  <title>基于XMPP实现简单的聊天功能(四) | Reddick</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Reddick</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/07/25/iOS-build-your-chart-app-with-xmpp-framework-4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Reddick">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Reddick">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">基于XMPP实现简单的聊天功能(四)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-07-25T14:10:20+08:00">
+                2016-07-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2016/07/25/iOS-build-your-chart-app-with-xmpp-framework-4/" class="leancloud_visitors" data-flag-title="基于XMPP实现简单的聊天功能(四)">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h4><p>XMPP提供了RFC 2779 定义的基本的即时消息和出席信息功能。XMPP的核心功能定义在XMPP CORE文档中（RFC3920），为各种类型的准实时消息应用提供了一个构造基础。</p>
+<h5 id="消息的类型"><a href="#消息的类型" class="headerlink" title="消息的类型"></a>消息的类型</h5><p>消息的类型可以分为以下几类：</p>
+<ul>
+<li>chat 消息是在一对一聊天会话的语境被发送. 一个兼容的客户端应该(SHOULD)在一个允许两个实体进行一对一聊天的界面中显示消息,包括适当的会话历史.</li>
+<li>error 发生了一个和上次发送者发送的消息有关的错误。</li>
+<li>groupchat 群聊</li>
+<li>headline 一个消息可能是由一个递送或广播内容的自动化服务生成的(新闻, 体育, 市场信息, RSS feeds, 等等.). 这个消息是不需要回复的, 一个兼容客户端应该(SHOULD) 在一个适当的和单独消息,聊天会话,或群聊会话不同的界面显示这个消息(例如, 不给接收者提供回复能力).</li>
+<li>normal 这个消息是一个在一对一会话或群聊会话之外的单独消息, 并且它希望接收者能够回复.</li>
+</ul>
+<h5 id="子元素"><a href="#子元素" class="headerlink" title="子元素"></a>子元素</h5><p>Message消息主要包括三种子元素：</p>
+<ul>
+<li><subject>元素包含了人类可读的 XML 字符数据指明这个消息的主题.</subject></li>
+<li>元素包含人类可读的XML字符数据表达消息的文本内容;这个子元素通常会有但是是可选的(OPTIONAL).body元素通常是我们消息的主体内容部分。</li>
+<li><thread>线索，类似于Email中那种回复记录。</thread>
+
+</li>
+</ul>
+<h4 id="接收消息"><a href="#接收消息" class="headerlink" title="接收消息"></a>接收消息</h4><p>在XMPPStream中提供了接收Message节点的方法：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">- (<span class="keyword">void</span>)xmppStream:(XMPPStream *)sender didReceiveMessage:(XMPPMessage *)message;</div></pre></td></tr></table></figure>
+<p>XMPPMessage是XMPPElement子类，其结构是XML格式的节点信息。大概结构如下：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">message</span></span></div><div class="line">       <span class="attr">to</span>=<span class="string">'romeo@example.net'</span></div><div class="line">       <span class="attr">from</span>=<span class="string">'juliet@example.com/balcony'</span></div><div class="line">       <span class="attr">type</span>=<span class="string">'chat'</span></div><div class="line">       <span class="attr">xml:lang</span>=<span class="string">'en'</span>&gt;</div><div class="line">     <span class="tag">&lt;<span class="name">body</span>&gt;</span>Wherefore art thou, Romeo?<span class="tag">&lt;/<span class="name">body</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">message</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>XMPPFramework提供了几种判断是否为聊天消息的方法：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">- (<span class="built_in">BOOL</span>)isChatMessage;</div><div class="line">- (<span class="built_in">BOOL</span>)isChatMessageWithBody;</div><div class="line">- (<span class="built_in">BOOL</span>)isErrorMessage;</div><div class="line">- (<span class="built_in">BOOL</span>)isMessageWithBody;</div></pre></td></tr></table></figure>
+<p>通常情况下我们的消息内容保存在body中，所以在获取聊天消息内容时，只需要取出<code>[message body]</code>中的内容即可。</p>
+<h4 id="发送消息"><a href="#发送消息" class="headerlink" title="发送消息"></a>发送消息</h4><p>XMPPFramework提供了一系列创建消息实体的方法：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">+ (XMPPMessage *)messageFromElement:(<span class="built_in">NSXMLElement</span> *)element;</div><div class="line">+ (XMPPMessage *)message;</div><div class="line">+ (XMPPMessage *)messageWithType:(<span class="built_in">NSString</span> *)type;</div><div class="line">+ (XMPPMessage *)messageWithType:(<span class="built_in">NSString</span> *)type to:(XMPPJID *)to;</div><div class="line">+ (XMPPMessage *)messageWithType:(<span class="built_in">NSString</span> *)type to:(XMPPJID *)jid elementID:(<span class="built_in">NSString</span> *)eid;</div><div class="line">+ (XMPPMessage *)messageWithType:(<span class="built_in">NSString</span> *)type to:(XMPPJID *)jid elementID:(<span class="built_in">NSString</span> *)eid child:(<span class="built_in">NSXMLElement</span> *)childElement;</div><div class="line">+ (XMPPMessage *)messageWithType:(<span class="built_in">NSString</span> *)type elementID:(<span class="built_in">NSString</span> *)eid;</div><div class="line">+ (XMPPMessage *)messageWithType:(<span class="built_in">NSString</span> *)type elementID:(<span class="built_in">NSString</span> *)eid child:(<span class="built_in">NSXMLElement</span> *)childElement;</div><div class="line">+ (XMPPMessage *)messageWithType:(<span class="built_in">NSString</span> *)type child:(<span class="built_in">NSXMLElement</span> *)childElement;</div></pre></td></tr></table></figure>
+<p>具体的示例代码如下：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> *  发送文本消息</div><div class="line"> *</div><div class="line"> */</div><div class="line">- (<span class="keyword">void</span>)sendTextMessage:(<span class="built_in">NSString</span> *)text to:(<span class="built_in">NSString</span> *)chatter complete:(<span class="keyword">void</span> (^)(<span class="built_in">NSError</span> *error,<span class="built_in">BOOL</span> isSuccess))complete &#123;</div><div class="line"></div><div class="line">    ICHMessageOperation *op = [ICHMessageOperation messageOperationWithBody:text to:chatter completeBlock:^(XMPPMessage *message, <span class="built_in">NSError</span> *error, <span class="built_in">BOOL</span> isSuccess) &#123;</div><div class="line">        <span class="keyword">if</span> (complete) &#123;</div><div class="line">            complete(error,isSuccess);</div><div class="line">        &#125;</div><div class="line">    &#125;];</div><div class="line">    [<span class="keyword">self</span>.messageOp addOperation:op];</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>ICHMessageOperation.m的代码如下</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">ICHMessageOperation</span> ()</span></div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>,<span class="keyword">copy</span>)XMPPMessage *sendMessage;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>,<span class="keyword">copy</span>)<span class="keyword">void</span> (^sendComplete)(XMPPMessage * message,<span class="built_in">NSError</span> *error ,<span class="built_in">BOOL</span> isSend);</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>,<span class="keyword">assign</span>,<span class="keyword">readwrite</span>,<span class="keyword">getter</span>=isFinished)<span class="built_in">BOOL</span> finished;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>,<span class="keyword">assign</span>,<span class="keyword">readwrite</span>,<span class="keyword">getter</span>=isExecuting)<span class="built_in">BOOL</span> executing;</div><div class="line"><span class="keyword">@end</span></div><div class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">ICHMessageOperation</span></span></div><div class="line"><span class="keyword">@synthesize</span> executing =_executing;</div><div class="line"><span class="keyword">@synthesize</span> finished = _finished;</div><div class="line">- (<span class="keyword">void</span>)main &#123;</div><div class="line">    <span class="keyword">if</span>(!<span class="keyword">self</span>.isCancelled) &#123;</div><div class="line"></div><div class="line">        [<span class="keyword">self</span> willChangeValueForKey:<span class="string">@"isExecuting"</span>];</div><div class="line">        _executing = <span class="literal">YES</span>;</div><div class="line">        [<span class="keyword">self</span> didChangeValueForKey:<span class="string">@"isExecuting"</span>];</div><div class="line">        [[<span class="keyword">self</span> currentStream] sendElement:<span class="keyword">self</span>.sendMessage];</div><div class="line">    &#125;<span class="keyword">else</span> &#123;</div><div class="line">        [<span class="keyword">self</span> finish];</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line">- (<span class="keyword">void</span>)start &#123;</div><div class="line">    [<span class="keyword">self</span> main];</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (<span class="keyword">void</span>)xmppStream:(XMPPStream *)sender didSendMessage:(XMPPMessage *)message &#123;</div><div class="line">    <span class="keyword">if</span> (!<span class="keyword">self</span>.isCancelled &amp;&amp; [[message elementID] isEqualToString:[<span class="keyword">self</span>.sendMessage elementID]]) &#123;</div><div class="line">        DDLogVerbose(<span class="string">@"发送消息成功"</span>);</div><div class="line">        <span class="keyword">if</span> (<span class="keyword">self</span>.sendComplete) &#123;</div><div class="line">            dispatch_main_safe(<span class="keyword">self</span>.sendComplete(message,<span class="literal">nil</span>,<span class="literal">YES</span>))</div><div class="line">        &#125;</div><div class="line">        [<span class="keyword">self</span> removeDelegate];</div><div class="line">        [<span class="keyword">self</span> finish];</div><div class="line">    &#125;<span class="keyword">else</span> &#123;</div><div class="line">        [<span class="keyword">self</span> finish];</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (<span class="keyword">void</span>)cancel &#123;</div><div class="line">    [<span class="keyword">super</span> cancel];</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (<span class="keyword">void</span>)xmppStream:(XMPPStream *)sender didFailToSendMessage:(XMPPMessage *)message error:(<span class="built_in">NSError</span> *)error &#123;</div><div class="line">    <span class="keyword">if</span> (!<span class="keyword">self</span>.isCancelled) &#123;</div><div class="line">        DDLogError(<span class="string">@"发送消息失败"</span>);</div><div class="line">        <span class="keyword">if</span> (<span class="keyword">self</span>.sendComplete) &#123;</div><div class="line">            dispatch_main_safe(<span class="keyword">self</span>.sendComplete(message,error,<span class="literal">NO</span>));</div><div class="line">        &#125;</div><div class="line">        [<span class="keyword">self</span> removeDelegate];</div><div class="line">        [<span class="keyword">self</span> finish];</div><div class="line">    &#125;<span class="keyword">else</span> &#123;</div><div class="line">        [<span class="keyword">self</span> finish];</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line">- (XMPPStream *)currentStream &#123;</div><div class="line">    <span class="keyword">return</span> [(ICHManager *)[[ICHClient sharedClient] chatManager] chatStream];</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (<span class="keyword">void</span>)removeDelegate &#123;</div><div class="line">    [[<span class="keyword">self</span> currentStream] removeDelegate:<span class="keyword">self</span>];</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (<span class="keyword">void</span>)dealloc &#123;</div><div class="line">    [<span class="keyword">self</span> removeDelegate];</div><div class="line">    <span class="keyword">self</span>.sendComplete = <span class="literal">nil</span>;</div><div class="line">    <span class="keyword">self</span>.sendMessage = <span class="literal">nil</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line">+ (<span class="keyword">instancetype</span>)messageOperationWithBody:(<span class="built_in">NSString</span> *)text</div><div class="line">                                      to:(<span class="built_in">NSString</span> *)chatter</div><div class="line">                           completeBlock:(<span class="keyword">void</span> (^)(XMPPMessage *message,<span class="built_in">NSError</span> *error ,<span class="built_in">BOOL</span> isSuccess))complete &#123;</div><div class="line">    ICHMessageOperation *op = [[<span class="keyword">self</span> alloc]init];</div><div class="line"></div><div class="line">    XMPPJID *chatterJid = [XMPPJID jidWithString:[<span class="built_in">NSString</span> stringWithFormat:<span class="string">@"%@%@"</span>,chatter,iChatServerName]];</div><div class="line">    XMPPMessage *msg = [XMPPMessage messageWithType:<span class="string">@"chat"</span> to:chatterJid];</div><div class="line">    [msg addAttributeWithName:<span class="string">@"id"</span> stringValue:[<span class="built_in">NSString</span> stringWithFormat:<span class="string">@"%@"</span>,@([[<span class="built_in">NSDate</span> date] timeIntervalSince1970])]];</div><div class="line"></div><div class="line">    [msg addBody:text];</div><div class="line">    op.sendMessage = msg;</div><div class="line">    op.sendComplete = complete;</div><div class="line">    [[op currentStream] addDelegate:op delegateQueue:dispatch_get_main_queue()];</div><div class="line">    <span class="keyword">return</span> op;</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (<span class="built_in">BOOL</span>)isAsynchronous &#123;</div><div class="line">    <span class="keyword">return</span> <span class="literal">YES</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (<span class="built_in">BOOL</span>)isConcurrent &#123;</div><div class="line">    <span class="keyword">return</span> <span class="literal">YES</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (<span class="keyword">void</span>)finish</div><div class="line">&#123;</div><div class="line">    <span class="keyword">self</span>.sendMessage = <span class="literal">nil</span>;</div><div class="line">    [<span class="keyword">self</span> willChangeValueForKey:<span class="string">@"isExecuting"</span>];</div><div class="line">    [<span class="keyword">self</span> willChangeValueForKey:<span class="string">@"isFinished"</span>];</div><div class="line">    _executing = <span class="literal">NO</span>;</div><div class="line">    _finished = <span class="literal">YES</span>;</div><div class="line">    [<span class="keyword">self</span> didChangeValueForKey:<span class="string">@"isExecuting"</span>];</div><div class="line">    [<span class="keyword">self</span> didChangeValueForKey:<span class="string">@"isFinished"</span>];</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">@end</span></div></pre></td></tr></table></figure>
+<h4 id="消息聊天的处理"><a href="#消息聊天的处理" class="headerlink" title="消息聊天的处理"></a>消息聊天的处理</h4><p>在处理了如何收发消息之后，接下来需要将聊天的内容展示出来，这里推荐一个聊天界面的iOS框架：JSQMessagesViewController <a href="https://github.com/jessesquires/JSQMessagesViewController" target="_blank" rel="external">GitHub地址</a><br>关于如何使用JSQMessageViewController这里不做详细介绍了，可以参考官方的一些内容。<br>使用JSQMessageViewController只需要继承JSQMessagesViewController，然后override一些方法，部分逻辑处理代码如下：</p>
+<p>点击发送按钮的事件处理：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">- (<span class="keyword">void</span>)didPressSendButton:(<span class="built_in">UIButton</span> *)button</div><div class="line">       withMessageText:(<span class="built_in">NSString</span> *)text</div><div class="line">              senderId:(<span class="built_in">NSString</span> *)senderId</div><div class="line">     senderDisplayName:(<span class="built_in">NSString</span> *)senderDisplayName</div><div class="line">                  date:(<span class="built_in">NSDate</span> *)date &#123;</div><div class="line"></div><div class="line">    ICHMessageModel *message = [[ICHMessageModel alloc] initWithSenderId:senderId</div><div class="line">                                             senderDisplayName:senderDisplayName</div><div class="line">                                                          date:date</div><div class="line">                                                          text:text];</div><div class="line"></div><div class="line">    __<span class="keyword">weak</span> <span class="keyword">typeof</span> (*&amp;<span class="keyword">self</span>) wself = <span class="keyword">self</span>;</div><div class="line">    [[ICHClient sharedClient].chatManager sendTextMessage:text to:_chatterId complete:^(<span class="built_in">NSError</span> *error, <span class="built_in">BOOL</span> isSuccess) &#123;</div><div class="line">        __<span class="keyword">strong</span> <span class="keyword">typeof</span> (*&amp;wself) sself =wself;</div><div class="line">        <span class="keyword">if</span> (isSuccess) &#123;</div><div class="line">            [JSQSystemSoundPlayer jsq_playMessageSentSound];</div><div class="line">            [sself-&gt;_dataArray addObject:message];</div><div class="line">            [sself finishSendingMessageAnimated:<span class="literal">YES</span>];</div><div class="line"></div><div class="line">        &#125;<span class="keyword">else</span> &#123;</div><div class="line">            DDLogError(<span class="string">@"send message failed:%@"</span>,error);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">    &#125;];</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>Cell的样式处理：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">- (<span class="built_in">UICollectionViewCell</span> *)collectionView:(<span class="built_in">UICollectionView</span> *)collectionView cellForItemAtIndexPath:(<span class="built_in">NSIndexPath</span> *)indexPath &#123;</div><div class="line">    <span class="comment">/**</span></div><div class="line">     *  Override point for customizing cells</div><div class="line">     */</div><div class="line">    JSQMessagesCollectionViewCell *cell = (JSQMessagesCollectionViewCell *)[<span class="keyword">super</span> collectionView:collectionView cellForItemAtIndexPath:indexPath];</div><div class="line"></div><div class="line">    ICHMessageModel *msg = [_dataArray objectAtIndex:indexPath.item];</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (!msg.isMediaMessage) &#123;</div><div class="line"></div><div class="line">        <span class="keyword">if</span> ([msg.senderId isEqualToString:<span class="keyword">self</span>.senderId]) &#123;</div><div class="line">            cell.textView.textColor = [<span class="built_in">UIColor</span> whiteColor];</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">else</span> &#123;</div><div class="line">            cell.textView.textColor = [<span class="built_in">UIColor</span> darkGrayColor];</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        cell.textView.linkTextAttributes = @&#123; <span class="built_in">NSForegroundColorAttributeName</span> : cell.textView.textColor,</div><div class="line">                                              <span class="built_in">NSUnderlineStyleAttributeName</span> : @(<span class="built_in">NSUnderlineStyleSingle</span> | <span class="built_in">NSUnderlinePatternSolid</span>) &#125;;</div><div class="line">    &#125;</div><div class="line">    cell.delegate = <span class="keyword">self</span>;</div><div class="line">    <span class="keyword">return</span> cell;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>聊天Cell背景的处理：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">- (<span class="keyword">id</span>&lt;JSQMessageBubbleImageDataSource&gt;)collectionView:(JSQMessagesCollectionView *)collectionView messageBubbleImageDataForItemAtIndexPath:(<span class="built_in">NSIndexPath</span> *)indexPath &#123;</div><div class="line">    ICHMessageModel *model = _dataArray[indexPath.row];</div><div class="line">    <span class="keyword">if</span> ([model.senderId isEqualToString: <span class="keyword">self</span>.senderId]) &#123;</div><div class="line">        <span class="keyword">return</span> _bubbleModel.senderBubble;</div><div class="line">    &#125;<span class="keyword">else</span> &#123;</div><div class="line">        <span class="keyword">return</span> _bubbleModel.recieverBubble;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>日期显示的处理：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">- (<span class="built_in">NSAttributedString</span> *)collectionView:(JSQMessagesCollectionView *)collectionView attributedTextForCellTopLabelAtIndexPath:(<span class="built_in">NSIndexPath</span> *)indexPath &#123;</div><div class="line"></div><div class="line">    ICHMessageModel *currentModel = _dataArray[indexPath.row];</div><div class="line">    <span class="keyword">if</span> (indexPath.row ==<span class="number">0</span>) &#123;</div><div class="line">        <span class="keyword">return</span> [[<span class="built_in">NSAttributedString</span> alloc]initWithString:[TimeHelper stringWithDate:currentModel.date] attributes:@&#123;<span class="built_in">NSForegroundColorAttributeName</span>:RGBA(<span class="number">115</span>, <span class="number">115</span>, <span class="number">115</span>, <span class="number">1</span>)&#125;];</div><div class="line">    &#125;<span class="keyword">else</span> &#123;</div><div class="line">        ICHMessageModel *preModel = _dataArray[indexPath.row - <span class="number">1</span>];</div><div class="line">        <span class="keyword">if</span> (timeBetweenMessages(preModel, currentModel) &gt; defaultMessageDuration) &#123;</div><div class="line">            <span class="keyword">return</span> [[<span class="built_in">NSAttributedString</span> alloc]initWithString:[TimeHelper stringWithDate:currentModel.date] attributes:@&#123;<span class="built_in">NSForegroundColorAttributeName</span>:RGBA(<span class="number">115</span>, <span class="number">115</span>, <span class="number">115</span>, <span class="number">1</span>)&#125;];</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">return</span> <span class="literal">nil</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="built_in">NSTimeInterval</span> timeBetweenMessages(ICHMessageModel *pre,ICHMessageModel *suf) &#123;</div><div class="line"></div><div class="line">    <span class="keyword">return</span> <span class="built_in">CFDateGetTimeIntervalSinceDate</span>((<span class="built_in">CFDateRef</span>)suf.date,(<span class="built_in">CFDateRef</span>)pre.date);</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (<span class="built_in">CGFloat</span>)collectionView:(JSQMessagesCollectionView *)collectionView layout:(JSQMessagesCollectionViewFlowLayout *)collectionViewLayout heightForCellTopLabelAtIndexPath:(<span class="built_in">NSIndexPath</span> *)indexPath &#123;</div><div class="line">    ICHMessageModel *currentModel = _dataArray[indexPath.row];</div><div class="line">    <span class="keyword">if</span> (indexPath.row ==<span class="number">0</span>) &#123;</div><div class="line">        <span class="keyword">return</span> <span class="number">20.0</span>f;</div><div class="line">    &#125;<span class="keyword">else</span> &#123;</div><div class="line">        ICHMessageModel *preModel = _dataArray[indexPath.row - <span class="number">1</span>];</div><div class="line">        <span class="keyword">if</span> (timeBetweenMessages(preModel, currentModel) &gt; defaultMessageDuration) &#123;</div><div class="line">            <span class="keyword">return</span> <span class="number">20.0</span>f;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="number">0.0</span>f;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>接收到消息的处理：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">- (<span class="keyword">void</span>)didRecieveMessage:(ICHMessageModel *)message &#123;</div><div class="line">    <span class="keyword">if</span> ([message.senderId isEqualToString:_chatterId] || [message.senderId isEqualToString:currentUser]) &#123;</div><div class="line">        [_dataArray addObject:message];</div><div class="line">        [JSQSystemSoundPlayer jsq_playMessageReceivedSound];</div><div class="line"></div><div class="line">        [<span class="keyword">self</span> finishReceivingMessage];</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="发送自定义消息："><a href="#发送自定义消息：" class="headerlink" title="发送自定义消息："></a>发送自定义消息：</h4><p>XMPP支持发送自定义的消息如音视频，图片等，这种消息的处理需要我们的客户端做自定义的处理，比如发送图片，我们可以在body体中表明信息的类型，然后在message中添加自定义的子节点：<br>创建一个自定义图片类型的子节点如下：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">XMPPJID *chatterJid = [XMPPJID jidWithString:[<span class="built_in">NSString</span> stringWithFormat:<span class="string">@"%@%@"</span>,chatter,iChatServerName]];</div><div class="line">XMPPMessage *msg = [XMPPMessage messageWithType:<span class="string">@"chat"</span> to:chatterJid];</div><div class="line">[msg addAttributeWithName:<span class="string">@"id"</span> stringValue:[<span class="built_in">NSString</span> stringWithFormat:<span class="string">@"%@"</span>,@([[<span class="built_in">NSDate</span> date] timeIntervalSince1970])]];</div><div class="line"></div><div class="line">[msg addBody:<span class="string">@"image"</span>];</div><div class="line"><span class="built_in">NSData</span> *data = <span class="built_in">UIImageJPEGRepresentation</span>(image,<span class="number">0.3</span>);</div><div class="line"><span class="built_in">NSString</span> *base64 = [data base64EncodedStringWithOptions:<span class="built_in">NSDataBase64Encoding64CharacterLineLength</span>];</div><div class="line">[msg addChild:[XMPPElement elementWithName:<span class="string">@"attachment"</span> stringValue:base64]];</div><div class="line">[<span class="keyword">self</span>.chatStream sendElement:msg];</div></pre></td></tr></table></figure>
+<p>我们将需要发送的图片进行了base64编码，并添加到了message的<attachment>节点，那么在接收消息时可以这样判断：</attachment></p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">ICHMessageModel *msgModel;</div><div class="line"><span class="keyword">if</span> ([message elementForName:<span class="string">@"attachment"</span>]) &#123;</div><div class="line">    <span class="keyword">switch</span> ([<span class="keyword">self</span> messageTypeWithString:message.body]) &#123;</div><div class="line">        <span class="keyword">case</span> ICHMessageModelTypePhoto: &#123;</div><div class="line">            <span class="built_in">NSString</span> *base64 = [[message elementForName:<span class="string">@"attachment"</span>] stringValue];</div><div class="line">            <span class="built_in">NSData</span> *data = [[<span class="built_in">NSData</span> alloc]initWithBase64EncodedString:base64 options:<span class="built_in">NSDataBase64DecodingIgnoreUnknownCharacters</span>];</div><div class="line">            <span class="built_in">UIImage</span> *image = [<span class="built_in">UIImage</span> imageWithData:data];</div><div class="line">            JSQPhotoMediaItem *item = [[JSQPhotoMediaItem alloc]initWithImage:image];</div><div class="line">            item.appliesMediaViewMaskAsOutgoing = <span class="literal">NO</span>;</div><div class="line">            msgModel = [[ICHMessageModel alloc]initWithSenderId:message.from.user senderDisplayName:message.from.user date:[<span class="built_in">NSDate</span> date] media:item];</div><div class="line">            msgModel.msg = message;</div><div class="line">        &#125;</div><div class="line">            <span class="keyword">break</span>;</div><div class="line"></div><div class="line">        <span class="keyword">default</span>:</div><div class="line">            <span class="keyword">break</span>;</div><div class="line">    &#125;</div><div class="line">&#125;<span class="keyword">else</span> &#123;</div><div class="line">    msgModel = [ICHMessageModel messageWithSenderId:message.from.user  displayName:message.from.user text:message.body];</div><div class="line">    msgModel.msg = message;</div><div class="line">&#125;</div><div class="line"><span class="keyword">return</span> msgModel;</div></pre></td></tr></table></figure>
+<p>效果如下:<br><a href="http://7xq0yv.com1.z0.glb.clouddn.com/chat-sample.png" target="_blank" rel="external"><img src="http://7xq0yv.com1.z0.glb.clouddn.com/chat-sample.png" alt="image"></a></p>
+<p>剩下的文件，语音，视频，定位的消息体都可以参考类似的实现方式，另外关于将body中添加”image”标示的方式可以另外添加一个MessageType节点以表明消息的类型：比如<messagetype>0</messagetype>,这样可以简化在客户端处理相应的逻辑内容。<br>此外：在发送内容比较多的大的数据时（比如高清图片，视频文件等），测试时要保证对方的账号在线，否则后台将会对数据的内容进行缓存，由于openfire服务器对离线消息的默认缓存大小为0.1MB,所以发送的内容包过大时，会返回503错误。其实XMPP服务器最好不要做一些文件，图片内容的缓存，而应该另外建立一个文件服务器提供存储服务，在消息中保留图片和文件资源的url链接地址而不是实际内容，这样可以优化XMPP的性能，同时客户端可以更好的处理文件的下载与存储的逻辑。</p>
+<h4 id="富文本消息"><a href="#富文本消息" class="headerlink" title="富文本消息"></a>富文本消息</h4><p>XEP－0071：XHTML-IM协议是一个扩展的富文本协议，该协议仍然是一个草案协议，不过可以在自定义的消息中使用，可以创建类似于微信分享中的分享文档样式，其写法类似于HTML，使用起来很方便。简单的消息样式如下：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">message</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">body</span>&gt;</span>hi!<span class="tag">&lt;/<span class="name">body</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">html</span> <span class="attr">xmlns</span>=<span class="string">'http://jabber.org/protocol/xhtml-im'</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">body</span> <span class="attr">xmlns</span>=<span class="string">'http://www.w3.org/1999/xhtml'</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">p</span> <span class="attr">style</span>=<span class="string">'font-weight:bold'</span>&gt;</span>hi!<span class="tag">&lt;/<span class="name">p</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">body</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">html</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">message</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>HTML完全可以当作一个WebView来展示！所以订阅号和一些链接的H5消息完全可以采用这种形式。</p>
+<h4 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h4><ol>
+<li><a href="http://wiki.jabbercn.org/RFC3921" target="_blank" rel="external">RFC3921 wiki</a></li>
+<li><a href="http://xmpp.org/rfcs/rfc3921.html" target="_blank" rel="external">XMPP rfc3921</a></li>
+<li><a href="http://www.cnblogs.com/dsxniubility/p/4307073.html" target="_blank" rel="external">董柏然的博客</a></li>
+<li><a href="http://www.xmpp.org/extensions/xep-0071.html" target="_blank" rel="external">XEP-0071</a></li>
+</ol>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS/" rel="tag"># iOS</a>
+          
+            <a href="/tags/XMPP/" rel="tag"># XMPP</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/07/23/iOS-build-your-chart-app-with-xmpp-framework-3/" rel="next" title="基于XMPP实现简单的聊天功能(三)">
+                <i class="fa fa-chevron-left"></i> 基于XMPP实现简单的聊天功能(三)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/07/27/iOS-build-your-chart-app-with-xmpp-framework-5/" rel="prev" title="XMPP服务器优化">
+                XMPP服务器优化 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="Reddick" />
+          <p class="site-author-name" itemprop="name">Reddick</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">50</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#消息的类型"><span class="nav-number">1.1.</span> <span class="nav-text">消息的类型</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#子元素"><span class="nav-number">1.2.</span> <span class="nav-text">子元素</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#接收消息"><span class="nav-number">2.</span> <span class="nav-text">接收消息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#发送消息"><span class="nav-number">3.</span> <span class="nav-text">发送消息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#消息聊天的处理"><span class="nav-number">4.</span> <span class="nav-text">消息聊天的处理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#发送自定义消息："><span class="nav-number">5.</span> <span class="nav-text">发送自定义消息：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#富文本消息"><span class="nav-number">6.</span> <span class="nav-text">富文本消息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#参考文章"><span class="nav-number">7.</span> <span class="nav-text">参考文章</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Reddick</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("Ol4oMp1FneQ7gWrMKhYQLsFq-gzGzoHsz", "H57pffrWdrCIfFwrTaa4lwln");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

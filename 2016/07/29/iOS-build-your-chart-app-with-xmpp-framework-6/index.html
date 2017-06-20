@@ -1,0 +1,848 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="iOS,XMPP," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="概述本文主要介绍基于XMPP的多人聊天的实现。XMPP在其XEP-0045扩展中定义了一个用于多用户文本会议（群聊）的协议，类似于聊天室、QQ群等。 XMPP中的一些概念 affiliation岗位:XMPP定义的岗位有：所有者（owner）、管理者（admin）、成员（member）、排斥者（outcast）。 role:表达了用户和房间的临时联系，它只存在与一次访问期间。XMPP定义的角色有：">
+<meta name="keywords" content="iOS,XMPP">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于XMPP实现简单的聊天功能(五)">
+<meta property="og:url" content="http://yoursite.com/2016/07/29/iOS-build-your-chart-app-with-xmpp-framework-6/index.html">
+<meta property="og:site_name" content="Reddick">
+<meta property="og:description" content="概述本文主要介绍基于XMPP的多人聊天的实现。XMPP在其XEP-0045扩展中定义了一个用于多用户文本会议（群聊）的协议，类似于聊天室、QQ群等。 XMPP中的一些概念 affiliation岗位:XMPP定义的岗位有：所有者（owner）、管理者（admin）、成员（member）、排斥者（outcast）。 role:表达了用户和房间的临时联系，它只存在与一次访问期间。XMPP定义的角色有：">
+<meta property="og:updated_time" content="2017-06-20T08:48:14.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="基于XMPP实现简单的聊天功能(五)">
+<meta name="twitter:description" content="概述本文主要介绍基于XMPP的多人聊天的实现。XMPP在其XEP-0045扩展中定义了一个用于多用户文本会议（群聊）的协议，类似于聊天室、QQ群等。 XMPP中的一些概念 affiliation岗位:XMPP定义的岗位有：所有者（owner）、管理者（admin）、成员（member）、排斥者（outcast）。 role:表达了用户和房间的临时联系，它只存在与一次访问期间。XMPP定义的角色有：">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"hide","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/07/29/iOS-build-your-chart-app-with-xmpp-framework-6/"/>
+
+
+
+
+
+  <title>基于XMPP实现简单的聊天功能(五) | Reddick</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Reddick</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/07/29/iOS-build-your-chart-app-with-xmpp-framework-6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Reddick">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Reddick">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">基于XMPP实现简单的聊天功能(五)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-07-29T15:10:05+08:00">
+                2016-07-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2016/07/29/iOS-build-your-chart-app-with-xmpp-framework-6/" class="leancloud_visitors" data-flag-title="基于XMPP实现简单的聊天功能(五)">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h4><p>本文主要介绍基于XMPP的多人聊天的实现。XMPP在其XEP-0045扩展中定义了一个用于多用户文本会议（群聊）的协议，类似于聊天室、QQ群等。</p>
+<h5 id="XMPP中的一些概念"><a href="#XMPP中的一些概念" class="headerlink" title="XMPP中的一些概念"></a>XMPP中的一些概念</h5><ul>
+<li>affiliation岗位:XMPP定义的岗位有：所有者（owner）、管理者（admin）、成员（member）、排斥者（outcast）。</li>
+<li>role:表达了用户和房间的临时联系，它只存在与一次访问期间。XMPP定义的角色有：主持人（moderator）、与会者（paticipant）、游客（visitor）</li>
+</ul>
+<h4 id="发现群组"><a href="#发现群组" class="headerlink" title="发现群组"></a>发现群组</h4><p>XMPP提供了一个用于发现当前多人聊天Room的方式，客户端发起一个IQ节请求，其格式类似如下：</p>
+<p> Entity Queries Chat Service for Rooms<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">iq</span> <span class="attr">from</span>=<span class="string">'hag66@shakespeare.lit/pda'</span></span></div><div class="line">      <span class="attr">id</span>=<span class="string">'zb8q41f4'</span></div><div class="line">      <span class="attr">to</span>=<span class="string">'chat.shakespeare.lit'</span></div><div class="line">    <span class="attr">type</span>=<span class="string">'get'</span>&gt;</div><div class="line">  <span class="tag">&lt;<span class="name">query</span> <span class="attr">xmlns</span>=<span class="string">'http://jabber.org/protocol/disco#items'</span>/&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">iq</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<p>XMPPFramework提供了一个发现已存在房间的方法用于发现已有房间</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">- (<span class="built_in">BOOL</span>)discoverRoomsForServiceNamed:(<span class="built_in">NSString</span> *)serviceName;</div></pre></td></tr></table></figure>
+<p>通过代理回调方法，我们可以获取到当前已存在的房间。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> *  发现了房间</div><div class="line"> *</div><div class="line"> *  @param sender</div><div class="line"> *  @param services XML &lt;item jid='chat.shakespeare.lit' name='Chatroom Service'/&gt;</div><div class="line"> */</div><div class="line"></div><div class="line">- (<span class="keyword">void</span>)xmppMUC:(XMPPMUC *)sender didDiscoverRooms:(<span class="built_in">NSArray</span> *)rooms forServiceNamed:(<span class="built_in">NSString</span> *)serviceName &#123;</div><div class="line">    <span class="keyword">if</span> ([serviceName isEqualToString:iChatGroupServiceName]) &#123;</div><div class="line"></div><div class="line">        <span class="built_in">NSMutableArray</span> *newRooms = [[<span class="built_in">NSMutableArray</span> alloc]init];</div><div class="line">        <span class="keyword">for</span> (<span class="built_in">NSXMLElement</span> *room <span class="keyword">in</span> rooms) &#123;</div><div class="line">            <span class="built_in">NSString</span> *jidStr = [[room attributeForName:<span class="string">@"jid"</span>] stringValue];</div><div class="line">            XMPPJID *jid = [XMPPJID jidWithString:jidStr];</div><div class="line"></div><div class="line">            <span class="built_in">NSString</span> *name = [[room attributeForName:<span class="string">@"name"</span>] stringValue];</div><div class="line"></div><div class="line">            ICHGroupBuddy *groupBuddy = [[ICHGroupBuddy alloc]init];</div><div class="line">            groupBuddy.groupId = jid.user;</div><div class="line">            groupBuddy.groupName = name;</div><div class="line">            [newRooms addObject:groupBuddy];</div><div class="line">        &#125;</div><div class="line">        [_muldelegate didFetchGroups:[newRooms <span class="keyword">copy</span>]];</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>我们可以在XMPPMUCDelegate的回调中处理邀请事件，拒绝加入事件等。</p>
+<h4 id="接收到群组邀请"><a href="#接收到群组邀请" class="headerlink" title="接收到群组邀请"></a>接收到群组邀请</h4><figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> *  接收到邀请</div><div class="line"> *</div><div class="line"> *  @param sender</div><div class="line"> *  @param roomJID</div><div class="line"> *  @param message</div><div class="line"> */</div><div class="line">- (<span class="keyword">void</span>)xmppMUC:(XMPPMUC *)sender roomJID:(XMPPJID *)roomJID didReceiveInvitation:(XMPPMessage *)message &#123;</div><div class="line">    DDLogVerbose(<span class="string">@"%s"</span>,__func__);</div><div class="line">    XMPPRoom *room = [[XMPPRoom alloc]initWithRoomStorage:<span class="keyword">self</span>.groupStore jid:roomJID];</div><div class="line"></div><div class="line">    [room addDelegate:<span class="keyword">self</span> delegateQueue:dispatch_get_main_queue()];</div><div class="line"></div><div class="line">    [room activate:<span class="keyword">self</span>.chatStream];</div><div class="line">    [room joinRoomUsingNickname:<span class="keyword">self</span>.chatStream.myJID.user history:<span class="literal">nil</span>];</div><div class="line">    [_muldelegate didReciveGroupInvitation:roomJID.user];</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="申请群组被拒绝"><a href="#申请群组被拒绝" class="headerlink" title="申请群组被拒绝"></a>申请群组被拒绝</h4><figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> *  申请被拒绝</div><div class="line"> *</div><div class="line"> *  @param sender</div><div class="line"> *  @param roomJID</div><div class="line"> *  @param message</div><div class="line"> */</div><div class="line">- (<span class="keyword">void</span>)xmppMUC:(XMPPMUC *)sender roomJID:(XMPPJID *)roomJID didReceiveInvitationDecline:(XMPPMessage *)message &#123;</div><div class="line">    [_muldelegate rejectedByGroup:roomJID.user];</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="房间"><a href="#房间" class="headerlink" title="房间"></a>房间</h4><p>XMPPFramework使用XMPPRoom来代表一个房间，创建时需要提供一个CoreDataStorage,然后将其添加到Stream中。XMPP的room跟QQ的群还是有些区别的，当我们关闭了Stream后，便退出了群，想再次获取到群组中的消息时就需要再一次加入到群组中，所以如果想记录User加入了那些群组，还需要额外的做XMPP的扩展。</p>
+<h5 id="加入房间"><a href="#加入房间" class="headerlink" title="加入房间"></a>加入房间</h5><figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * Sends a presence element to the join room.</div><div class="line"> * </div><div class="line"> * If the room already exists, then the xmppRoomDidJoin: delegate method will be invoked upon</div><div class="line"> * notifiaction from the server that we successfully joined the room.</div><div class="line"> * </div><div class="line"> * If the room did not already exist, and the authenticated user is allowed to create the room,</div><div class="line"> * then the server will automatically create the room,</div><div class="line"> * and the xmppRoomDidCreate: delegate method will be invoked (followed by xmppRoomDidJoin:).</div><div class="line"> * You'll then need to configure the room before others can join.</div><div class="line"> * </div><div class="line"> * @param desiredNickname (required)</div><div class="line"> *        The nickname to use within the room.</div><div class="line"> *        If the room is anonymous, this is the only identifier other occupants of the room will see.</div><div class="line"> * </div><div class="line"> * @param history (optional)</div><div class="line"> *        A history element specifying how much discussion history to request from the server.</div><div class="line"> *        E.g. &lt;history maxstanzas='100'/&gt;</div><div class="line"> *        For more information, please see XEP-0045, Section 7.1.16 - Managing Discussion History.</div><div class="line"> *        You may also want to query your storage module to see how old the most recent stored message for this room is.</div><div class="line"> * </div><div class="line"> * @see fetchConfigurationForm</div><div class="line"> * @see configureRoomUsingOptions:</div><div class="line">**/</div><div class="line">- (<span class="keyword">void</span>)joinRoomUsingNickname:(<span class="built_in">NSString</span> *)desiredNickname history:(<span class="built_in">NSXMLElement</span> *)history;</div></pre></td></tr></table></figure>
+<p>如果Room不存在，那么就会创建一个新的房间，如果存在，会加入到房间中。nickname可以指定为自己JID。</p>
+<p>关于XMPPRoom的所有事件都可以通过<code>XMPPRoomDelegate</code>中的回调方法获得：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//创建房间成功</span></div><div class="line">- (<span class="keyword">void</span>)xmppRoomDidCreate:(XMPPRoom *)sender;</div><div class="line"></div><div class="line"><span class="comment">//获取到了Room的配置信息，需要事先发起 [ROOM fetchConfigurationForm]方法</span></div><div class="line">- (<span class="keyword">void</span>)xmppRoom:(XMPPRoom *)sender didFetchConfigurationForm:(<span class="built_in">NSXMLElement</span> *)configForm;</div><div class="line"></div><div class="line"><span class="comment">//加入房间</span></div><div class="line">- (<span class="keyword">void</span>)xmppRoomDidJoin:(XMPPRoom *)sender;</div><div class="line"></div><div class="line"><span class="comment">//离开房间</span></div><div class="line">- (<span class="keyword">void</span>)xmppRoomDidLeave:(XMPPRoom *)sender;</div><div class="line"></div><div class="line"><span class="comment">//房间被销毁</span></div><div class="line">- (<span class="keyword">void</span>)xmppRoomDidDestroy:(XMPPRoom *)sender;</div><div class="line"></div><div class="line"><span class="comment">//获取到了房间中的消息</span></div><div class="line">- (<span class="keyword">void</span>)xmppRoom:(XMPPRoom *)sender didReceiveMessage:(XMPPMessage *)message fromOccupant:(XMPPJID *)occupantJID;</div><div class="line"></div><div class="line"><span class="comment">//获取到了成员列表</span></div><div class="line">- (<span class="keyword">void</span>)xmppRoom:(XMPPRoom *)sender didFetchMembersList:(<span class="built_in">NSArray</span> *)items;</div></pre></td></tr></table></figure>
+<p>XMPPRoom并没有做持久化相关的方法，所以加入了哪些房间以及离开了哪些房间需要我们自己去做处理。同时，如果在离线时被踢出了房间是无法离开房间的消息的，因为离开房间发送的是一个Presence节点，如果不在线，是收不到该请求的。<br>如果仅仅是创建一个在线聊天室，那么XMPPFramework提供的方法已经足够使用了，UI层的展示方法与单聊的类似，Message的from需要处理下消息是谁发来的，同时做下头像的处理。</p>
+<h4 id="TODO"><a href="#TODO" class="headerlink" title="TODO"></a>TODO</h4><ul>
+<li>管理者如何邀请成员。</li>
+<li>配置已经存在的房间的属性。</li>
+<li>获取房间的属性信息。</li>
+</ul>
+<h4 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h4><ul>
+<li><a href="http://xmpp.org/extensions/xep-0045.html#associations" target="_blank" rel="external">XEP-0045</a></li>
+<li><a href="http://wiki.jabbercn.org/XEP-0045" target="_blank" rel="external">wiki XEP-0045中文</a></li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS/" rel="tag"># iOS</a>
+          
+            <a href="/tags/XMPP/" rel="tag"># XMPP</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/07/27/iOS-build-your-chart-app-with-xmpp-framework-5/" rel="next" title="XMPP服务器优化">
+                <i class="fa fa-chevron-left"></i> XMPP服务器优化
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/07/31/iOS-build-your-chart-app-with-xmpp-framework-7/" rel="prev" title="理解XMPP中的节">
+                理解XMPP中的节 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="Reddick" />
+          <p class="site-author-name" itemprop="name">Reddick</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">50</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#XMPP中的一些概念"><span class="nav-number">1.1.</span> <span class="nav-text">XMPP中的一些概念</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#发现群组"><span class="nav-number">2.</span> <span class="nav-text">发现群组</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#接收到群组邀请"><span class="nav-number">3.</span> <span class="nav-text">接收到群组邀请</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#申请群组被拒绝"><span class="nav-number">4.</span> <span class="nav-text">申请群组被拒绝</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#房间"><span class="nav-number">5.</span> <span class="nav-text">房间</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#加入房间"><span class="nav-number">5.1.</span> <span class="nav-text">加入房间</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TODO"><span class="nav-number">6.</span> <span class="nav-text">TODO</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#参考资料"><span class="nav-number">7.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Reddick</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("Ol4oMp1FneQ7gWrMKhYQLsFq-gzGzoHsz", "H57pffrWdrCIfFwrTaa4lwln");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
