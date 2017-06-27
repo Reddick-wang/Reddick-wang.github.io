@@ -99,7 +99,7 @@
 <meta name="keywords" content="iOS,运行时技术">
 <meta property="og:type" content="article">
 <meta property="og:title" content="iOS开发之运行时(二)">
-<meta property="og:url" content="http://yoursite.com/2016/06/19/iOS-runtime-tutorial-2/index.html">
+<meta property="og:url" content="http://reddick-wang.github.io/2016/06/19/iOS-runtime-tutorial-2/index.html">
 <meta property="og:site_name" content="Reddick">
 <meta property="og:description" content="理解objc_msgSend在对象中调用方法是Objective-C中经常使用的功能，在iOS中术语叫做消息传递机制。例如[someObj doSomeThing];,其中someObj叫做消息的“接收者”，doSomeThing叫做选择子(@selector:)，在传递消息时可以携带一些参数，可以有返回值。编译器在看到该消息时，会将其转化为一条标准的C语言函数调用，即objc_msgSend，其">
 <meta property="og:image" content="http://7xq0yv.com1.z0.glb.clouddn.com/method-forwarding.png">
@@ -135,7 +135,7 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2016/06/19/iOS-runtime-tutorial-2/"/>
+  <link rel="canonical" href="http://reddick-wang.github.io/2016/06/19/iOS-runtime-tutorial-2/"/>
 
 
 
@@ -280,7 +280,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/06/19/iOS-runtime-tutorial-2/">
+    <link itemprop="mainEntityOfPage" href="http://reddick-wang.github.io/2016/06/19/iOS-runtime-tutorial-2/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Reddick">
@@ -367,7 +367,7 @@
 <h3 id="理解消息转发机制"><a href="#理解消息转发机制" class="headerlink" title="理解消息转发机制"></a>理解消息转发机制</h3><p>在无法找到消息对应的选择子后，会启动消息转发机制。消息转发分为两个阶段：</p>
 <ol>
 <li>首先，运行时系统会先询问该方法是否可以动态解析：即动态的为类或实例添加方法。在上一节中我们已经提到了如何为类或实例添加方法。在此阶段，对象先调用所属类的<code>+ (BOOL)resolveInstanceMethod:(SEL)selector</code>方法，所以我们可以在这里动态的为函数添加实现方法。</li>
-<li>如果在转发消息的第一步仍然不能处理该消息，接收者还有第二次处理selector的机会，这是，对象会调用<code>- (id)forwardingTargetForSelector:(SEL)aSelector;</code>方法，返回的id为消息的其他备援对象。通过这种机制，我们可以模拟实现多播代理技术,如果对该特性感兴趣，可以参考我之前写过的博客:<a href="http://reddick-wang.github.io/2016/02/16/iOS多播代理/" target="_blank" rel="external">iOS多播代理</a></li>
+<li>如果在转发消息的第一步仍然不能处理该消息，接收者还有第二次处理selector的机会，这是，对象会调用<code>- (id)forwardingTargetForSelector:(SEL)aSelector;</code>方法，返回的id为消息的其他备援对象。通过这种机制，我们可以模拟实现多播代理技术,如果对该特性感兴趣，可以参考我之前写过的博客:<a href="http://reddick-wang.github.io/2016/02/16/iOS多播代理/">iOS多播代理</a></li>
 <li>如果消息到这里时仍然未能处理，那么系统将会启动完整的转发机制，此步骤会调用<code>- (void)forwardInvocation:(NSInvocation *)anInvocation</code>方法,runtime会将target，action，以及参数全部封装在一个Invocation中，执行消息转发，我们可以在该函数中将消息转发给其他对象，如:</li>
 </ol>
 <figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">- (<span class="keyword">void</span>)forwardInvocation:(<span class="built_in">NSInvocation</span> *)anInvocation &#123;</div><div class="line">    <span class="keyword">if</span> ([B respondsToSelector:[anInvocation selector]) &#123;</div><div class="line">        [anInvocation B];</div><div class="line">    &#125; <span class="keyword">else</span> &#123;</div><div class="line">        [<span class="keyword">super</span> forwardInvocation:anInvocation];</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
