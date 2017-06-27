@@ -275,7 +275,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://reddick-wang.github.io/2016/02/16/iOS-mutiple-delegates-leaning/">
+    <link itemprop="mainEntityOfPage" href="http://reddick-wang.github.io/2016/02/16/iOS-mutiple-delegate-with-NSProxy/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Reddick">
@@ -294,7 +294,7 @@
         
           <h2 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2016/02/16/iOS-mutiple-delegates-leaning/" itemprop="url">iOS多播代理 (一)</a></h2>
+                <a class="post-title-link" href="/2016/02/16/iOS-mutiple-delegate-with-NSProxy/" itemprop="url">iOS多播代理(二)</a></h2>
         
 
         <div class="post-meta">
@@ -324,7 +324,7 @@
 
           
           
-             <span id="/2016/02/16/iOS-mutiple-delegates-leaning/" class="leancloud_visitors" data-flag-title="iOS多播代理 (一)">
+             <span id="/2016/02/16/iOS-mutiple-delegate-with-NSProxy/" class="leancloud_visitors" data-flag-title="iOS多播代理(二)">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -354,18 +354,12 @@
       
         
           
-          概述在iOS中实现回调的方法大概有以下几种：
-
-协议代理
-通知中心
-匿名函数
-KVO键值观察
-
-在使用中，一对一的回调以上四种都可以实现，而对于一对多，范围大的回调，一般都会采用通知中心。 然而苹果的通知中心的实现在多线程编程时是有问题的，即通知的接收者所接收的通知有可能并不是在发出通知的线程上，这
+          使用NSProxy实现多播代理NSProxy 是Objective-C的另一个根类，是一个虚类，本身仅有几个创建方法和NSObject协议，调用任何其他方法都会触发消息转发机制，所以他是实现多播代理和模拟多继承的更好的方式。
+因为NSProxy本身是一个虚类，甚至连init方法都没有，所以我们在创建
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2016/02/16/iOS-mutiple-delegates-leaning/#more" rel="contents">
+            <a class="btn" href="/2016/02/16/iOS-mutiple-delegate-with-NSProxy/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -797,7 +791,7 @@ KVO键值观察
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://reddick-wang.github.io/2016/01/31/iOS-archive-with-script/">
+    <link itemprop="mainEntityOfPage" href="http://reddick-wang.github.io/2016/01/31/iOS-使用脚本打包app/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Reddick">
@@ -816,7 +810,7 @@ KVO键值观察
         
           <h2 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2016/01/31/iOS-archive-with-script/" itemprop="url">使用脚本打包app</a></h2>
+                <a class="post-title-link" href="/2016/01/31/iOS-使用脚本打包app/" itemprop="url">使用脚本打包app</a></h2>
         
 
         <div class="post-meta">
@@ -868,7 +862,7 @@ KVO键值观察
 
           
           
-             <span id="/2016/01/31/iOS-archive-with-script/" class="leancloud_visitors" data-flag-title="使用脚本打包app">
+             <span id="/2016/01/31/iOS-使用脚本打包app/" class="leancloud_visitors" data-flag-title="使用脚本打包app">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -905,7 +899,7 @@ xcodebuild
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2016/01/31/iOS-archive-with-script/#more" rel="contents">
+            <a class="btn" href="/2016/01/31/iOS-使用脚本打包app/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1342,7 +1336,7 @@ xcodebuild
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://reddick-wang.github.io/2015/09/15/iOS-transition-between-controllers/">
+    <link itemprop="mainEntityOfPage" href="http://reddick-wang.github.io/2015/09/15/iOS-控制器转场场切换/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Reddick">
@@ -1361,7 +1355,7 @@ xcodebuild
         
           <h2 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2015/09/15/iOS-transition-between-controllers/" itemprop="url">iOS开发之控制器专场切换</a></h2>
+                <a class="post-title-link" href="/2015/09/15/iOS-控制器转场场切换/" itemprop="url">iOS开发之控制器转场场切换</a></h2>
         
 
         <div class="post-meta">
@@ -1391,7 +1385,7 @@ xcodebuild
 
           
           
-             <span id="/2015/09/15/iOS-transition-between-controllers/" class="leancloud_visitors" data-flag-title="iOS开发之控制器专场切换">
+             <span id="/2015/09/15/iOS-控制器转场场切换/" class="leancloud_visitors" data-flag-title="iOS开发之控制器转场场切换">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -1429,7 +1423,7 @@ PresentModal(模态视图),主要用于收集用户输入信息、临时呈现�
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2015/09/15/iOS-transition-between-controllers/#more" rel="contents">
+            <a class="btn" href="/2015/09/15/iOS-控制器转场场切换/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>

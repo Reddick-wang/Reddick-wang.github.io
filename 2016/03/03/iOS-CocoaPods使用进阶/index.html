@@ -1,0 +1,856 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="google-site-verification" content="NeTdZhGK6vi-W-fSpXVdSlfNQxHkZUzcjoDUnNyoLDw" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="iOS,工具," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="创建Podfile文件CocoaPods在iOS开发中已经成为了事实上的依赖库管理工具，做iOS开发如果不会使用CocoaPods,我只能呵呵哒了。什么？你会用pod install了? 你会pod update了?作为iOS强大的依赖库管理工具，Pod的用法可不止这些哦～。创建一个Podfile文件：很多人都会去touch一个文件，然后找个以前的项目copy下里面的内容。没必要，执行下面的命令就">
+<meta name="keywords" content="iOS,工具">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CocoaPods使用进阶">
+<meta property="og:url" content="http://reddick-wang.github.io/2016/03/03/iOS-CocoaPods使用进阶/index.html">
+<meta property="og:site_name" content="Reddick">
+<meta property="og:description" content="创建Podfile文件CocoaPods在iOS开发中已经成为了事实上的依赖库管理工具，做iOS开发如果不会使用CocoaPods,我只能呵呵哒了。什么？你会用pod install了? 你会pod update了?作为iOS强大的依赖库管理工具，Pod的用法可不止这些哦～。创建一个Podfile文件：很多人都会去touch一个文件，然后找个以前的项目copy下里面的内容。没必要，执行下面的命令就">
+<meta property="og:image" content="http://7xq0yv.com1.z0.glb.clouddn.com/sina16-2-25.png">
+<meta property="og:updated_time" content="2017-06-27T09:57:49.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="CocoaPods使用进阶">
+<meta name="twitter:description" content="创建Podfile文件CocoaPods在iOS开发中已经成为了事实上的依赖库管理工具，做iOS开发如果不会使用CocoaPods,我只能呵呵哒了。什么？你会用pod install了? 你会pod update了?作为iOS强大的依赖库管理工具，Pod的用法可不止这些哦～。创建一个Podfile文件：很多人都会去touch一个文件，然后找个以前的项目copy下里面的内容。没必要，执行下面的命令就">
+<meta name="twitter:image" content="http://7xq0yv.com1.z0.glb.clouddn.com/sina16-2-25.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"hide","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://reddick-wang.github.io/2016/03/03/iOS-CocoaPods使用进阶/"/>
+
+
+
+
+
+  <title>CocoaPods使用进阶 | Reddick</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Reddick</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-sitemap">
+          <a href="/sitemap.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            站点地图
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://reddick-wang.github.io/2016/03/03/iOS-CocoaPods使用进阶/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Reddick">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Reddick">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">CocoaPods使用进阶</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-03-03T11:55:23+08:00">
+                2016-03-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2016/03/03/iOS-CocoaPods使用进阶/" class="leancloud_visitors" data-flag-title="CocoaPods使用进阶">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="创建Podfile文件"><a href="#创建Podfile文件" class="headerlink" title="创建Podfile文件"></a>创建Podfile文件</h3><p>CocoaPods在iOS开发中已经成为了事实上的依赖库管理工具，做iOS开发如果不会使用CocoaPods,我只能呵呵哒了。<br>什么？你会用pod install了? 你会pod update了?作为iOS强大的依赖库管理工具，Pod的用法可不止这些哦～。<br>创建一个Podfile文件：很多人都会去touch一个文件，然后找个以前的项目copy下里面的内容。没必要，执行下面的命令就可以了：<code>pod init</code>，那么如何添加一个pod仓库就不详细讲了，下面我们讨论下Podfile中的其他使用：</p>
+<p><code>platform :ios, &#39;7.0&#39;</code><br>指定适配的最低版本，有时候一些仓库只支持iOS8以上，这时候工程是跑不起来的，所以如果你的项目最低版本要求iOS7，那么要么换其他库，要么去查找仓库是否有老版本支持iOS7.</p>
+<p><code>use_frameworks!</code><br>是否使用swift版本，如果你使用Objective-C开发，那么就要关闭掉这个选项，CocoaPods没办法指定每个项目使用OC版或者是swift版本，而是统一要么Objective-C，要么Swift!</p>
+<p><code>inhibit_all_warnings!</code><br>忽略pods中的所有警告。如果你想让所有的target都可以使用相同的Pods 可以增加abstract_target字段,例如：</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">pod <span class="string">'ShowsKit'</span></div><div class="line">pod <span class="string">'Fabric'</span></div><div class="line"></div><div class="line"><span class="comment"># Has it's own copy of ShowsKit + ShowWebAuth</span></div><div class="line">target <span class="string">'ShowsiOS'</span> <span class="keyword">do</span></div><div class="line">  pod <span class="string">'ShowWebAuth'</span></div><div class="line"><span class="keyword">end</span></div><div class="line"></div><div class="line"><span class="comment"># Has it's own copy of ShowsKit + ShowTVAuth</span></div><div class="line">target <span class="string">'ShowsTV'</span> <span class="keyword">do</span></div><div class="line">  pod <span class="string">'ShowTVAuth'</span></div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
+<h3 id="指定开源库版本"><a href="#指定开源库版本" class="headerlink" title="指定开源库版本"></a>指定开源库版本</h3><p>通常情况下，我们从pod添加开源库时并未指定版本号，其实这样是不安全的，如果pod的仓库频繁更新的话，一些老项目可能会因为所依赖的第三方仓库更新而导致无法跑起来。所以在使用时制定一个版本号或者一个版本是一个明智的选择。<br>如<code>pod &#39;Objection&#39;, &#39;0.9&#39;</code></p>
+<p>当然你也可以增加波浪号来增加tag的区间，详细的内容可以参考CocoaPods的官方地址。<br><code>pod &#39;Objection&#39;, &#39;～0.9&#39;</code></p>
+<h3 id="使用本地仓库"><a href="#使用本地仓库" class="headerlink" title="使用本地仓库"></a>使用本地仓库</h3><p>如果你有些仓库是来自本地，那么指定它的路径就好啦～</p>
+<p><code>pod &#39;AFNetworking&#39;, :path =&gt; &#39;~/Documents/AFNetworking&#39;</code></p>
+<p>除此之外你也可以指定一个包含podspec的仓库：<br><code>pod &#39;AFNetworking&#39;, :git =&gt; &#39;https://github.com/gowalla/AFNetworking.git&#39;</code></p>
+<p>当然，你也可以切换选择不同的分支或者切换tag亦或者是一个commit号：<br><code>pod &#39;AFNetworking&#39;, :git =&gt; &#39;https://github.com/gowalla/AFNetworking.git&#39;, :branch =&gt; &#39;dev&#39;/:tag =&gt; &#39;0.7.0/:commit =&gt; &#39;082f8319af</code></p>
+<p>以上便是Podfile的内容了。下面将介绍如何创建podspec，可能很多人不懂为什么要做podspec。试想如下情况：在一个项目中，如果你使用了CocoaPods导入了一个开源库，然而这个库并没有你想的那么好，它可能跟一些其他库有冲突(-.= 比如支付宝和ZBar)，也可能他写的一些方法你需要增加一些改动，然而最好的方法就是直接修改代码。嗯，没错，就是想直接改代码！可是如果在CocoaPods中改动的代码是不会同步到别人的机器上的，而且每次更新CocoaPods的话都要提心吊胆的是否写过的东西被改掉了,这时候podspec登场了，我们可以fork开源库的地址，然后配置下podspec，然后指定git更新的仓库地址，这样，只需要更新我们自己的仓库就好了，间接的相当于改了源码。</p>
+<p>创建一个Podspec：你可以手动的创建一个spec文件，然后把值一个个的写进去，或者简单执行如下命令行:</p>
+<p><code>pod spec create</code>来创建一个spec文件，一个spec文件的内容像下面这样：</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">Pod::Spec.new <span class="keyword">do</span> <span class="params">|spec|</span></div><div class="line">  spec.name             = <span class="string">'Reachability'</span></div><div class="line">  spec.version          = <span class="string">'3.1.0'</span></div><div class="line">  spec.license          = &#123; <span class="symbol">:type</span> =&gt; <span class="string">'MIT'</span> &#125;</div><div class="line">  spec.homepage         = <span class="string">'https://github.com/tonymillion/Reachability'</span></div><div class="line">  spec.authors          = &#123; <span class="string">'Tony Million'</span> =&gt; <span class="string">'tonymillion@gmail.com'</span> &#125;</div><div class="line">  spec.summary          = <span class="string">'ARC and GCD Compatible Reachability Class for iOS and OS X.'</span></div><div class="line">  spec.source           = &#123; <span class="symbol">:git</span> =&gt; <span class="string">'https://github.com/tonymillion/Reachability.git'</span>, <span class="symbol">:tag</span> =&gt; <span class="string">'v3.1.0'</span> &#125;</div><div class="line">  spec.source_files     = <span class="string">'Reachability.h,m'</span></div><div class="line">  spec.framework        = <span class="string">'SystemConfiguration'</span></div><div class="line">  spec.requires_arc     = <span class="literal">true</span></div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
+<p>如何创建一个CocoaPods仓库：我们可以通过命令<code>pod lib create &lt; YourLibrary &gt;</code>来创建一个Pods仓库，这时候Pod会询问你repo的语言ObjC or Swift ,是否需要创建一个demo工程，使用测试框架：Specta/Kiwi/不使用,是否开启UITest，你的项目前缀（必须指定）,之后Pod会执行<code>pod install</code>来安装仓库，安装完成后会打开Xcode工程，这时候我们会看到一个Xcode工程，类似于下面这样：</p>
+<p><a href="http://7xq0yv.com1.z0.glb.clouddn.com/sina16-2-25.png" target="_blank" rel="external"><img src="http://7xq0yv.com1.z0.glb.clouddn.com/sina16-2-25.png" alt="image"></a></p>
+<p>你可以编辑工程中的podspec文件，和ReadMe文件，在Demo工程中增加使用示例，当然，如果你想增加测试，在Test文件夹下编写测试用例。</p>
+<p>需要注意的是，在你开始编写工程前，需要先把你的Pod工程写好，即Development Pods工程，你需要将你自己的库文件添加到Development Pods/StrikethroughLabel/Pod/Classes/文件夹下，资源文件需要添加到该目录的Assets文件夹下。</p>
+<p>然后，你需要编写你的podspec文件，该文件将指引Pod完成其所有需要做的工作。</p>
+<p><a href="http://ishalou.com/blog/2012/10/16/how-to-create-a-cocoapods-spec-file/" target="_blank" rel="external">关于podspec文件如何编写，这里有一篇比较好的文章</a></p>
+<p>在你编写完podspec后需要执行<code>pod lib lint</code> 或者 <code>pod spec lint</code> (在包含podspec文件的文件夹下执行). 如果没有警告，说明你的spec文件编写的没有问题，如果你使用Objective-C编写工程的话请关闭掉工程中Podfile中的use_frameworks! 然后执行 <code>pod install</code> 这样就可以在Example工程中使用Pod中的文件了(每次你更新过Development Pod中的文件时，都需要执行<code>pod install</code>或者<code>pod update</code>去更新pods),如果你的工程可以正常运行，试着把它push到你的github上，然后在项目中试着使用。<br>如果你还不满足于此，想把你的开源库分享给其他人，试着去提交到trunk上吧。<a href="https://guides.cocoapods.org/making/getting-setup-with-trunk" target="_blank" rel="external">指南在这里</a></p>
+<p>参考文章：<a href="https://guides.cocoapods.org" target="_blank" rel="external">CocoaPods.org</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS/" rel="tag"># iOS</a>
+          
+            <a href="/tags/工具/" rel="tag"># 工具</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/02/16/iOS-mutiple-delegates-leaning/" rel="next" title="iOS多播代理 (一)">
+                <i class="fa fa-chevron-left"></i> iOS多播代理 (一)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/04/23/iOS-移植FFMpeg/" rel="prev" title="iOS-移植FFMpeg">
+                iOS-移植FFMpeg <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="Reddick" />
+          <p class="site-author-name" itemprop="name">Reddick</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">50</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建Podfile文件"><span class="nav-number">1.</span> <span class="nav-text">创建Podfile文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#指定开源库版本"><span class="nav-number">2.</span> <span class="nav-text">指定开源库版本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用本地仓库"><span class="nav-number">3.</span> <span class="nav-text">使用本地仓库</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Reddick</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("Ol4oMp1FneQ7gWrMKhYQLsFq-gzGzoHsz", "H57pffrWdrCIfFwrTaa4lwln");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
