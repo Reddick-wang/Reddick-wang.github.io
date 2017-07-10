@@ -1,0 +1,863 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="google-site-verification" content="NeTdZhGK6vi-W-fSpXVdSlfNQxHkZUzcjoDUnNyoLDw" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="iOS," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="作为一名iOS开发工程师，打包ipa是开发中常用的一环，然而由于很多初次接触证书的初学者来说，打包的流程并不是很熟悉，以至于常常在项目中打包常常出现各种问题。 几个基本概念 开发者证书的类型apple的开发者证书大体分为两类：企业开发者证书和个人开发者证书。价格分别为$299，$99,企业开发者证书不可以上架appstore，不过可以在应用市场上发布企业级app，个人开发者证书可以上架appsto">
+<meta name="keywords" content="iOS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS应用程序打包流程">
+<meta property="og:url" content="http://reddick-wang.github.io/2016/06/27/iOS应用程序打包流程/index.html">
+<meta property="og:site_name" content="Reddick">
+<meta property="og:description" content="作为一名iOS开发工程师，打包ipa是开发中常用的一环，然而由于很多初次接触证书的初学者来说，打包的流程并不是很熟悉，以至于常常在项目中打包常常出现各种问题。 几个基本概念 开发者证书的类型apple的开发者证书大体分为两类：企业开发者证书和个人开发者证书。价格分别为$299，$99,企业开发者证书不可以上架appstore，不过可以在应用市场上发布企业级app，个人开发者证书可以上架appsto">
+<meta property="og:image" content="http://7xq0yv.com1.z0.glb.clouddn.com/account-list.png">
+<meta property="og:image" content="http://7xq0yv.com1.z0.glb.clouddn.com/development-cetifacates.png">
+<meta property="og:image" content="http://7xq0yv.com1.z0.glb.clouddn.com/production-cetificate.png">
+<meta property="og:image" content="http://7xq0yv.com1.z0.glb.clouddn.com/in-house.png">
+<meta property="og:image" content="http://7xq0yv.com1.z0.glb.clouddn.com/app-store.png">
+<meta property="og:image" content="http://7xq0yv.com1.z0.glb.clouddn.com/archive.png">
+<meta property="og:image" content="http://7xq0yv.com1.z0.glb.clouddn.com/build%20configuration.png">
+<meta property="og:image" content="http://7xq0yv.com1.z0.glb.clouddn.com/products-app.png">
+<meta property="og:image" content="http://7xq0yv.com1.z0.glb.clouddn.com/p12.jpg">
+<meta property="og:image" content="http://7xq0yv.com1.z0.glb.clouddn.com/pgy.png">
+<meta property="og:updated_time" content="2017-06-27T10:50:10.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="iOS应用程序打包流程">
+<meta name="twitter:description" content="作为一名iOS开发工程师，打包ipa是开发中常用的一环，然而由于很多初次接触证书的初学者来说，打包的流程并不是很熟悉，以至于常常在项目中打包常常出现各种问题。 几个基本概念 开发者证书的类型apple的开发者证书大体分为两类：企业开发者证书和个人开发者证书。价格分别为$299，$99,企业开发者证书不可以上架appstore，不过可以在应用市场上发布企业级app，个人开发者证书可以上架appsto">
+<meta name="twitter:image" content="http://7xq0yv.com1.z0.glb.clouddn.com/account-list.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"hide","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://reddick-wang.github.io/2016/06/27/iOS应用程序打包流程/"/>
+
+
+
+
+
+  <title>iOS应用程序打包流程 | Reddick</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Reddick</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-sitemap">
+          <a href="/sitemap.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            站点地图
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://reddick-wang.github.io/2016/06/27/iOS应用程序打包流程/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Reddick">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Reddick">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">iOS应用程序打包流程</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-06-27T20:27:37+08:00">
+                2016-06-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2016/06/27/iOS应用程序打包流程/" class="leancloud_visitors" data-flag-title="iOS应用程序打包流程">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>作为一名iOS开发工程师，打包ipa是开发中常用的一环，然而由于很多初次接触证书的初学者来说，打包的流程并不是很熟悉，以至于常常在项目中打包常常出现各种问题。</p>
+<h3 id="几个基本概念"><a href="#几个基本概念" class="headerlink" title="几个基本概念"></a>几个基本概念</h3><ol>
+<li><p>开发者证书的类型<br>apple的开发者证书大体分为两类：企业开发者证书和个人开发者证书。价格分别为$299，$99,企业开发者证书不可以上架appstore，不过可以在应用市场上发布企业级app，个人开发者证书可以上架appstore，不过不可以在自己的网站上发布通用的app。其中个人开发者证书又分为两种，个人(person)开发者和组织开发者(organization)。个人开发者可以升级为组织开发者，不过需要申请邓氏码，在apple的官网上可以找到申请的链接，大概10天左右的时间会下来。企业的开发者证书同样也需要申请邓氏码，在申请下来后需要再等2周才可以激活in-house的使用。</p>
+</li>
+<li><p>Certificates<br>这里的Certificates指的是Certificates, Identifiers &amp; Profiles中的Certificates，当我们申请下来苹果的开发者后，会出现在account分栏下，点击即可进入查看Certificates。<a href="http://7xq0yv.com1.z0.glb.clouddn.com/account-list.png" target="_blank" rel="external"><img src="http://7xq0yv.com1.z0.glb.clouddn.com/account-list.png" alt="image"></a>Certificates分为两类，测试证书(development)和生产证书(Production)。<br>测试证书主要用做小范围测试用，测试证书主要包括用做打包ipa的证书和测试用的推送证书。<a href="http://7xq0yv.com1.z0.glb.clouddn.com/development-cetifacates.png" target="_blank" rel="external"><img src="http://7xq0yv.com1.z0.glb.clouddn.com/development-cetifacates.png" alt="image"></a><br>生产证书的种类略多，不过常用的也是跟测试证书一样，一个打包的生产证书和一个生产环境的推送证书。<a href="http://7xq0yv.com1.z0.glb.clouddn.com/production-cetificate.png" target="_blank" rel="external"><img src="http://7xq0yv.com1.z0.glb.clouddn.com/production-cetificate.png" alt="image"></a></p>
+</li>
+<li><p>Identifiers<br>Identifiers是一个身份标示，在Xcode中其实就是Bundle Identifier，这个标示着我们app的唯一性。所以在创建时，一般以反转的域名作为包名。创建appid时，我们可以在这里包含测试和生产使用的推送证书，以及应用内支付和一些其他的设置。</p>
+</li>
+<li><p>Devices<br>这个就比较简单了，就是我们的设备，通过添加uuid可以把设备添加进来，在测试包含设备时可以包含进来。</p>
+</li>
+<li><p>Provisioning Profiles<br>描述文件，其实就是将证书，配置信息以及包含的设备整合起来生成一个可以Xcode可读的配置文件。该配置文件在项目的Build Settings -&gt;Code Signing Identity中可以选择，在打包时，需要将程式的Bundle Id, team,以及该Profile保持一致，否则就会出现签名错误的问题。在创建描述文件时，apple会依据帐号类型的不同，提供不同类型的distribution描述文件，企业级开发证书会如下图所示:<a href="http://7xq0yv.com1.z0.glb.clouddn.com/in-house.png" target="_blank" rel="external"><img src="http://7xq0yv.com1.z0.glb.clouddn.com/in-house.png" alt="image"></a>其中In House是生成无安装限制的企业描述文件，主要用于企业级app分发，Ad Hoc证书是生成的带有测试设备的测试证书，用于测试程式分发。个人开发证书如下：<a href="http://7xq0yv.com1.z0.glb.clouddn.com/app-store.png" target="_blank" rel="external"><img src="http://7xq0yv.com1.z0.glb.clouddn.com/app-store.png" alt="image"></a></p>
+</li>
+</ol>
+<h3 id="打包的常见方式"><a href="#打包的常见方式" class="headerlink" title="打包的常见方式"></a>打包的常见方式</h3><ol>
+<li><p>通过archive打包<br><a href="http://7xq0yv.com1.z0.glb.clouddn.com/archive.png" target="_blank" rel="external"><img src="http://7xq0yv.com1.z0.glb.clouddn.com/archive.png" alt="image"></a></p>
+</li>
+<li><p>将configuration的run设置为release configuration，通过build生成.app文件，再将文件拖入到iTunes中生成ipa文件。<br><a href="http://7xq0yv.com1.z0.glb.clouddn.com/build%20configuration.png" target="_blank" rel="external"><img src="http://7xq0yv.com1.z0.glb.clouddn.com/build%20configuration.png" alt="image"></a><br><a href="http://7xq0yv.com1.z0.glb.clouddn.com/products-app.png" target="_blank" rel="external"><img src="http://7xq0yv.com1.z0.glb.clouddn.com/products-app.png" alt="image"></a></p>
+</li>
+<li><p>通过脚本打包。</p>
+</li>
+</ol>
+<h3 id="将根开发证书共享给其他人"><a href="#将根开发证书共享给其他人" class="headerlink" title="将根开发证书共享给其他人"></a>将根开发证书共享给其他人</h3><p>在app开发中，可能会有多个iOS开发工程师共同开发的情形，这时候需要将开发证书共享给其他人，以方便其他人使用该证书进行真机测试以及打包。具有证书管理权的开发者应将其在certificate中创建的证书下载到本地，并安装至钥匙串，然后将具有权限的证书导出为p12证书，并设置密码分发给其他人。注意不要将证书的私钥导出，那样做毫无意义。<a href="http://7xq0yv.com1.z0.glb.clouddn.com/p12.jpg" target="_blank" rel="external"><img src="http://7xq0yv.com1.z0.glb.clouddn.com/p12.jpg" alt="image"></a>。在需要导出的证书上右键选择导出证书，选择导出为个人信息交换证书。</p>
+<p>如果你不知道自己打的包到底是什么configuration，那么可以去蒲公英分发测试上上传下应用这样就可以看到你打包的app是否是正确的了。<a href="http://7xq0yv.com1.z0.glb.clouddn.com/pgy.png" target="_blank" rel="external"><img src="http://7xq0yv.com1.z0.glb.clouddn.com/pgy.png" alt="image"></a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS/" rel="tag"># iOS</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/06/23/理解对象的等同性/" rel="next" title="理解对象的等同性">
+                <i class="fa fa-chevron-left"></i> 理解对象的等同性
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/06/29/理解NSCopying协议/" rel="prev" title="理解NSCopying协议">
+                理解NSCopying协议 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="Reddick" />
+          <p class="site-author-name" itemprop="name">Reddick</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">50</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#几个基本概念"><span class="nav-number">1.</span> <span class="nav-text">几个基本概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#打包的常见方式"><span class="nav-number">2.</span> <span class="nav-text">打包的常见方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#将根开发证书共享给其他人"><span class="nav-number">3.</span> <span class="nav-text">将根开发证书共享给其他人</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Reddick</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("Ol4oMp1FneQ7gWrMKhYQLsFq-gzGzoHsz", "H57pffrWdrCIfFwrTaa4lwln");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

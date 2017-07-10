@@ -1,0 +1,990 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="google-site-verification" content="NeTdZhGK6vi-W-fSpXVdSlfNQxHkZUzcjoDUnNyoLDw" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Android," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="序可绘制对象资源是指可在屏幕上绘制的图形，可以应用到具有android:drawable属性的xml资源文件的图形。具有多种不同类型的可绘制对象： 位图文件位图图形文件（.png、.jpg 或 .gif） 当保存的在drawable目录中的文件为上述几种类型时，Android会为它们创建Drawable资源，编译的资源数据类型为BitmapDrawable指针 资源引用：在Java中：R.draw">
+<meta name="keywords" content="Android">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android学习笔记之可绘制对象资源">
+<meta property="og:url" content="http://reddick-wang.github.io/2017/04/28/Android学习笔记之可绘制对象资源/index.html">
+<meta property="og:site_name" content="Reddick">
+<meta property="og:description" content="序可绘制对象资源是指可在屏幕上绘制的图形，可以应用到具有android:drawable属性的xml资源文件的图形。具有多种不同类型的可绘制对象： 位图文件位图图形文件（.png、.jpg 或 .gif） 当保存的在drawable目录中的文件为上述几种类型时，Android会为它们创建Drawable资源，编译的资源数据类型为BitmapDrawable指针 资源引用：在Java中：R.draw">
+<meta property="og:updated_time" content="2017-06-27T10:45:52.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android学习笔记之可绘制对象资源">
+<meta name="twitter:description" content="序可绘制对象资源是指可在屏幕上绘制的图形，可以应用到具有android:drawable属性的xml资源文件的图形。具有多种不同类型的可绘制对象： 位图文件位图图形文件（.png、.jpg 或 .gif） 当保存的在drawable目录中的文件为上述几种类型时，Android会为它们创建Drawable资源，编译的资源数据类型为BitmapDrawable指针 资源引用：在Java中：R.draw">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"hide","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://reddick-wang.github.io/2017/04/28/Android学习笔记之可绘制对象资源/"/>
+
+
+
+
+
+  <title>Android学习笔记之可绘制对象资源 | Reddick</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Reddick</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-sitemap">
+          <a href="/sitemap.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            站点地图
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://reddick-wang.github.io/2017/04/28/Android学习笔记之可绘制对象资源/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Reddick">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Reddick">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">Android学习笔记之可绘制对象资源</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-28T16:55:02+08:00">
+                2017-04-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2017/04/28/Android学习笔记之可绘制对象资源/" class="leancloud_visitors" data-flag-title="Android学习笔记之可绘制对象资源">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="序"><a href="#序" class="headerlink" title="序"></a>序</h1><p>可绘制对象资源是指可在屏幕上绘制的图形，可以应用到具有<code>android:drawable</code>属性的xml资源文件的图形。具有多种不同类型的可绘制对象：</p>
+<h2 id="位图文件"><a href="#位图文件" class="headerlink" title="位图文件"></a>位图文件</h2><p>位图图形文件（.png、.jpg 或 .gif）</p>
+<p>当保存的在drawable目录中的文件为上述几种类型时，Android会为它们创建Drawable资源，编译的资源数据类型为<code>BitmapDrawable</code>指针</p>
+<h3 id="资源引用："><a href="#资源引用：" class="headerlink" title="资源引用："></a>资源引用：</h3><p>在Java中：R.drawable.filename<br>在XML中：@[package:]drawable/filename</p>
+<h3 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h3><p>在xml中创建的ImageView，可以为其添加drawable资源文件</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">ImageView</span></span></div><div class="line">        <span class="attr">android:id</span>=<span class="string">"@+id/dialog_image"</span></div><div class="line">        <span class="attr">android:layout_width</span>=<span class="string">"match_parent"</span></div><div class="line">        <span class="attr">android:layout_height</span>=<span class="string">"wrap_content"</span></div><div class="line">        <span class="attr">android:src</span>=<span class="string">"@mipmap/plus_logo"</span></div><div class="line">        <span class="attr">android:scaleType</span>=<span class="string">"fitCenter"</span></div><div class="line">        /&gt;</div></pre></td></tr></table></figure>
+<p>在代码中获取位图文件资源的方法如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Resources resources = getResources();</div><div class="line">resources.getDrawable(R.drawable.plus_logo);</div></pre></td></tr></table></figure>
+<p>为ImageView增加位图文件：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">imageView.setImageResource(R.drawable.plus_logo);</div></pre></td></tr></table></figure>
+<h3 id="XML位图"><a href="#XML位图" class="headerlink" title="XML位图"></a>XML位图</h3><p>xml位图文件是在XML中定义资源，指向位图文件，不过其可以为位图增加多种属性。</p>
+<h4 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h4><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version="1.0" encoding="utf-8"?&gt;</div><div class="line"><span class="tag">&lt;<span class="name">bitmap</span></span></div><div class="line">    <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span></div><div class="line">    <span class="attr">android:src</span>=<span class="string">"@[package:]drawable/drawable_resource"</span></div><div class="line">    <span class="attr">android:antialias</span>=<span class="string">[</span>"<span class="attr">true</span>" | "<span class="attr">false</span>"]</div><div class="line">    <span class="attr">android:dither</span>=<span class="string">[</span>"<span class="attr">true</span>" | "<span class="attr">false</span>"]</div><div class="line">    <span class="attr">android:filter</span>=<span class="string">[</span>"<span class="attr">true</span>" | "<span class="attr">false</span>"]</div><div class="line">    <span class="attr">android:gravity</span>=<span class="string">[</span>"<span class="attr">top</span>" | "<span class="attr">bottom</span>" | "<span class="attr">left</span>" | "<span class="attr">right</span>" | "<span class="attr">center_vertical</span>" |</div><div class="line">                      "<span class="attr">fill_vertical</span>" | "<span class="attr">center_horizontal</span>" | "<span class="attr">fill_horizontal</span>" |</div><div class="line">                      "<span class="attr">center</span>" | "<span class="attr">fill</span>" | "<span class="attr">clip_vertical</span>" | "<span class="attr">clip_horizontal</span>"]</div><div class="line">    <span class="attr">android:mipMap</span>=<span class="string">[</span>"<span class="attr">true</span>" | "<span class="attr">false</span>"]</div><div class="line">    <span class="attr">android:tileMode</span>=<span class="string">[</span>"<span class="attr">disabled</span>" | "<span class="attr">clamp</span>" | "<span class="attr">repeat</span>" | "<span class="attr">mirror</span>"] /&gt;</div></pre></td></tr></table></figure>
+<h5 id="元素"><a href="#元素" class="headerlink" title="元素"></a>元素</h5><ul>
+<li>bitmap 定义位图来源及其属性</li>
+<li>属性<ul>
+<li>android:src 资源文件的位置(必填)</li>
+<li>android:antialias boolean类型 是否启用抗锯齿</li>
+<li>android:dither boolean类型 当位图的像素配置与屏幕不同时（例如：ARGB 8888 位图和 RGB 565 屏幕），启用或停用位图抖动。</li>
+<li>android:filter<br>boolean类型。是否启用位图过滤。当位图收缩或拉伸以使其外观平滑时使用过滤。</li>
+<li>android:gravity 定义位图的重力。重力指示当位图小于容器时，可绘制对象在其容器中放置的位置。有如下几个属性值<br>top、bottom、left 、right、center_vertical、fill_vertical、center_horizontal、fill_horizontal、center、fill、clip_vertical 、clip_horizontal</li>
+<li>android:mipMap boolean类型，是否启用 mipmap 提示。</li>
+<li>android:tileMode 平铺模式，有以下可选值：<ul>
+<li>disabled 不平铺位图。这是默认值。</li>
+<li>clamp 当着色器绘制范围超出其原边界时复制边缘颜色</li>
+<li>repeat 水平和垂直重复着色器的图像。</li>
+<li>mirror 水平和垂直重复着色器的图像，交替镜像图像以使相邻图像始终相接。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="九宫格文件"><a href="#九宫格文件" class="headerlink" title="九宫格文件"></a>九宫格文件</h2><p>九宫格文件就是我们常说的.9文件，可以使用draw9patch生成，AS中也可以直接生成该文件。文件以.9.png结尾，编译生成的资源数据类型为NinePatchDrawable.</p>
+<h3 id="XML九宫格"><a href="#XML九宫格" class="headerlink" title="XML九宫格"></a>XML九宫格</h3><h4 id="语法-1"><a href="#语法-1" class="headerlink" title="语法"></a>语法</h4><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version="1.0" encoding="utf-8"?&gt;</div><div class="line"><span class="tag">&lt;<span class="name">nine-patch</span></span></div><div class="line">    <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span></div><div class="line">    <span class="attr">android:src</span>=<span class="string">"@[package:]drawable/drawable_resource"</span></div><div class="line">    <span class="attr">android:dither</span>=<span class="string">[</span>"<span class="attr">true</span>" | "<span class="attr">false</span>"] /&gt;</div></pre></td></tr></table></figure>
+<h2 id="图层列表"><a href="#图层列表" class="headerlink" title="图层列表"></a>图层列表</h2><p>图层列表可以按照列表的顺序绘制资源，列表的最后一个对象绘制在最顶部，类似于iOS中的<code>CAReplicatorLayer</code></p>
+<h3 id="语法-2"><a href="#语法-2" class="headerlink" title="语法"></a>语法</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version="1.0" encoding="utf-8"?&gt;</div><div class="line"><span class="tag">&lt;<span class="name">layer-list</span></span></div><div class="line">    <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span> &gt;</div><div class="line">    <span class="tag">&lt;<span class="name">item</span></span></div><div class="line">        <span class="attr">android:drawable</span>=<span class="string">"@[package:]drawable/drawable_resource"</span></div><div class="line">        <span class="attr">android:id</span>=<span class="string">"@[+][package:]id/resource_name"</span></div><div class="line">        <span class="attr">android:top</span>=<span class="string">"dimension"</span></div><div class="line">        <span class="attr">android:right</span>=<span class="string">"dimension"</span></div><div class="line">        <span class="attr">android:bottom</span>=<span class="string">"dimension"</span></div><div class="line">        <span class="attr">android:left</span>=<span class="string">"dimension"</span> /&gt;</div><div class="line"><span class="tag">&lt;/<span class="name">layer-list</span>&gt;</span></div></pre></td></tr></table></figure>
+<blockquote>
+<item>定义要放在图层可绘制对象中由其属性定义的位置的可绘制对象。必须是 <selector>元素的子项。接受子<code>bitmap</code>元素。</selector></item>
+
+</blockquote>
+<h3 id="状态列表"><a href="#状态列表" class="headerlink" title="状态列表"></a>状态列表</h3><p>状态列表常用于对于同一图形的不同状态显示不同的样式，比如Button，RadioButton等具有多种不同状态控件，可以利用状态列表来为每种状态设置可绘制的内容。编译的资源类型为StateListDrawable。</p>
+<blockquote>
+<p>在每个状态变更期间，将从上到下遍历状态列表，并使用第一个与当前状态匹配的项目。此选择并非基于“最佳匹配”，而是选择符合状态最低条件的第一个项目</p>
+</blockquote>
+<h3 id="语法-3"><a href="#语法-3" class="headerlink" title="语法"></a>语法</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version="1.0" encoding="utf-8"?&gt;</div><div class="line"><span class="tag">&lt;<span class="name">selector</span> <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span></span></div><div class="line">    <span class="attr">android:constantSize</span>=<span class="string">[</span>"<span class="attr">true</span>" | "<span class="attr">false</span>"]</div><div class="line">    <span class="attr">android:dither</span>=<span class="string">[</span>"<span class="attr">true</span>" | "<span class="attr">false</span>"]</div><div class="line">    <span class="attr">android:variablePadding</span>=<span class="string">[</span>"<span class="attr">true</span>" | "<span class="attr">false</span>"] &gt;</div><div class="line">    <span class="tag">&lt;<span class="name">item</span></span></div><div class="line">        <span class="attr">android:drawable</span>=<span class="string">"@[package:]drawable/drawable_resource"</span></div><div class="line">        <span class="attr">android:state_pressed</span>=<span class="string">[</span>"<span class="attr">true</span>" | "<span class="attr">false</span>"]</div><div class="line">        <span class="attr">android:state_focused</span>=<span class="string">[</span>"<span class="attr">true</span>" | "<span class="attr">false</span>"]</div><div class="line">        <span class="attr">android:state_hovered</span>=<span class="string">[</span>"<span class="attr">true</span>" | "<span class="attr">false</span>"]</div><div class="line">        <span class="attr">android:state_selected</span>=<span class="string">[</span>"<span class="attr">true</span>" | "<span class="attr">false</span>"]</div><div class="line">        <span class="attr">android:state_checkable</span>=<span class="string">[</span>"<span class="attr">true</span>" | "<span class="attr">false</span>"]</div><div class="line">        <span class="attr">android:state_checked</span>=<span class="string">[</span>"<span class="attr">true</span>" | "<span class="attr">false</span>"]</div><div class="line">        <span class="attr">android:state_enabled</span>=<span class="string">[</span>"<span class="attr">true</span>" | "<span class="attr">false</span>"]</div><div class="line">        <span class="attr">android:state_activated</span>=<span class="string">[</span>"<span class="attr">true</span>" | "<span class="attr">false</span>"]</div><div class="line">        <span class="attr">android:state_window_focused</span>=<span class="string">[</span>"<span class="attr">true</span>" | "<span class="attr">false</span>"] /&gt;</div><div class="line"><span class="tag">&lt;/<span class="name">selector</span>&gt;</span></div></pre></td></tr></table></figure>
+<h3 id="元素-1"><a href="#元素-1" class="headerlink" title="元素"></a>元素</h3><ul>
+<li>selector<br>必须为根元素，包含一个或多个item元素</li>
+<li>android:variablePadding<br>boolean 类型。如果可绘制对象的内边距应根据选择的当前状态而变化，则值为<code>true</code>；如果内边距应保持不变（基于所有状态的最大内边距），则值为<code>false</code>。启用此功能要求您在状态变更时处理执行布局，这通常不受支持。默认值为<code>false</code>。</li>
+<li><p>item<br>该元素定义了不同状态下的可绘制对象的属性。</p>
+<ul>
+<li>android:drawable</li>
+<li>android:state_pressed<br>boolean类型，定义对象的状态是按下或默认状态。</li>
+<li>android:state_focused<br>boolean类型 定义了对象是否在聚焦（可编辑）状态。</li>
+<li><p>android:state_selected<br>boolean类型，</p>
+<blockquote>
+<p>当焦点 (android:state_focused) 不充分（例如，列表视图有焦点但使用方向键选择其中的项目）时，使用所选状态。</p>
+</blockquote>
+</li>
+<li><p>android:state_checkable<br>boolean类型。如果当对象可选中时应使用此项目(如RadioGroup)，则值为<code>true</code>；如果 当对象不可选中时应使用此项目，则值为<code>false</code>。</p>
+</li>
+<li>android:state_checked<br>boolean类型。如果在对象已选中时应使用此项目，则值为<code>true</code>； 如果在对象未选中时应使用此项目，则值为<code>false</code>。</li>
+<li>android:state_enabled<br>boolean类型。如果在对象启用（能够接收触摸/点击事件）时应使用此项目， 则值为“true”；如果在对象停用时应使用此项目，则值为<code>false</code>。</li>
+<li>android:state_window_focused<br>boolean类型。如果当应用窗口有焦点（应用在前台）时应使用此项目，则值为<code>true</code>；如果当应用窗口没有焦点（例如，通知栏下拉或对话框出现）时应使用此项目，则值为<code>false</code>。</li>
+</ul>
+</li>
+</ul>
+<h3 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a>示例</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version="1.0" encoding="utf-8"?&gt;</div><div class="line"><span class="tag">&lt;<span class="name">selector</span> <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span>&gt;</span></div><div class="line"></div><div class="line">    <span class="tag">&lt;<span class="name">item</span> <span class="attr">android:state_pressed</span>=<span class="string">"true"</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">shape</span> <span class="attr">android:shape</span>=<span class="string">"rectangle"</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">corners</span> <span class="attr">android:radius</span>=<span class="string">"2dp"</span> /&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">solid</span> <span class="attr">android:color</span>=<span class="string">"#44BF1A"</span> /&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">shape</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">item</span>&gt;</span></div><div class="line"></div><div class="line">    <span class="tag">&lt;<span class="name">item</span> <span class="attr">android:state_enabled</span>=<span class="string">"true"</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">shape</span> <span class="attr">android:shape</span>=<span class="string">"rectangle"</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">corners</span> <span class="attr">android:radius</span>=<span class="string">"2dp"</span> /&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">solid</span> <span class="attr">android:color</span>=<span class="string">"#44BF1A"</span> /&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">shape</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">item</span>&gt;</span></div><div class="line"></div><div class="line">    <span class="tag">&lt;<span class="name">item</span> <span class="attr">android:state_enabled</span>=<span class="string">"false"</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">shape</span> <span class="attr">android:shape</span>=<span class="string">"rectangle"</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">corners</span> <span class="attr">android:radius</span>=<span class="string">"2dp"</span> /&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">solid</span> <span class="attr">android:color</span>=<span class="string">"#337523"</span> /&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">shape</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">item</span>&gt;</span></div><div class="line"></div><div class="line">    <span class="tag">&lt;<span class="name">item</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">shape</span> <span class="attr">android:shape</span>=<span class="string">"rectangle"</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">corners</span> <span class="attr">android:radius</span>=<span class="string">"2dp"</span> /&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">solid</span> <span class="attr">android:color</span>=<span class="string">"#337523"</span> /&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">shape</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">item</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">selector</span>&gt;</span></div></pre></td></tr></table></figure>
+<h2 id="级别列表"><a href="#级别列表" class="headerlink" title="级别列表"></a>级别列表</h2><p>管理大量备选可绘制对象的可绘制对象，每个可绘制对象都分配有最大的备选数量。使用<code>setLevel()</code>设置可绘制对象的级别值会加载级别列表中 <code>android:maxLevel</code> 值大于或等于传递到方法的值的可绘制对象资源。</p>
+<h3 id="语法-4"><a href="#语法-4" class="headerlink" title="语法"></a>语法</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version="1.0" encoding="utf-8"?&gt;</div><div class="line"><span class="tag">&lt;<span class="name">level-list</span></span></div><div class="line">    <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span> &gt;</div><div class="line">    <span class="tag">&lt;<span class="name">item</span></span></div><div class="line">        <span class="attr">android:drawable</span>=<span class="string">"@drawable/drawable_resource"</span></div><div class="line">        <span class="attr">android:maxLevel</span>=<span class="string">"integer"</span></div><div class="line">        <span class="attr">android:minLevel</span>=<span class="string">"integer"</span> /&gt;</div><div class="line"><span class="tag">&lt;/<span class="name">level-list</span>&gt;</span></div></pre></td></tr></table></figure>
+<h3 id="元素-2"><a href="#元素-2" class="headerlink" title="元素"></a>元素</h3><ul>
+<li>level-list<br>这必须是根元素。包含一个或多个 <item>元素。</item></li>
+<li>item<br>定义特定级别的可绘制对象<ul>
+<li>android:maxLevel<br>整型。此项目允许的最高级别。</li>
+<li>android:minLevel<br>整型。此项目允许的最低级别。</li>
+</ul>
+</li>
+</ul>
+<h3 id="示例-2"><a href="#示例-2" class="headerlink" title="示例"></a>示例</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version="1.0" encoding="utf-8"?&gt;</div><div class="line"><span class="tag">&lt;<span class="name">level-list</span> <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span> &gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">item</span></span></div><div class="line">        <span class="attr">android:drawable</span>=<span class="string">"@drawable/status_off"</span></div><div class="line">        <span class="attr">android:maxLevel</span>=<span class="string">"0"</span> /&gt;</div><div class="line">    <span class="tag">&lt;<span class="name">item</span></span></div><div class="line">        <span class="attr">android:drawable</span>=<span class="string">"@drawable/status_on"</span></div><div class="line">        <span class="attr">android:maxLevel</span>=<span class="string">"1"</span> /&gt;</div><div class="line"><span class="tag">&lt;/<span class="name">level-list</span>&gt;</span></div></pre></td></tr></table></figure>
+<h2 id="转换可绘制对象"><a href="#转换可绘制对象" class="headerlink" title="转换可绘制对象"></a>转换可绘制对象</h2><p><code>TransitionDrawable</code> 是可在两种可绘制对象资源之间交错淡出的可绘制对象。</p>
+<blockquote>
+<p>每个可绘制对象由单一<code>transition</code> 元素内的<code>item</code>元素表示。<strong>不支持超过两个项目</strong>。要向前转换，请调用 startTransition(timeIntval)。要向后转换，则调用 reverseTransition(timeIntval)。</p>
+</blockquote>
+<p>使用比较简单，不详细介绍了。</p>
+<h2 id="插入可绘制对象"><a href="#插入可绘制对象" class="headerlink" title="插入可绘制对象"></a>插入可绘制对象</h2><p>在 XML 文件中定义的以指定距离插入其他可绘制对象的可绘制对象。当视图需要小于视图实际边界的背景时，此类可绘制对象很有用。编译时生成<code>InsetDrawable</code>对象。</p>
+<h3 id="语法-5"><a href="#语法-5" class="headerlink" title="语法"></a>语法</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version="1.0" encoding="utf-8"?&gt;</div><div class="line"><span class="tag">&lt;<span class="name">inset</span></span></div><div class="line">    <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span></div><div class="line">    <span class="attr">android:drawable</span>=<span class="string">"@drawable/drawable_resource"</span></div><div class="line">    <span class="attr">android:insetTop</span>=<span class="string">"dimension"</span></div><div class="line">    <span class="attr">android:insetRight</span>=<span class="string">"dimension"</span></div><div class="line">    <span class="attr">android:insetBottom</span>=<span class="string">"dimension"</span></div><div class="line">    <span class="attr">android:insetLeft</span>=<span class="string">"dimension"</span> /&gt;</div></pre></td></tr></table></figure>
+<h3 id="示例-3"><a href="#示例-3" class="headerlink" title="示例"></a>示例</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version="1.0" encoding="utf-8"?&gt;</div><div class="line"><span class="tag">&lt;<span class="name">inset</span> <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span></span></div><div class="line">       <span class="attr">android:drawable</span>=<span class="string">"@drawable/plus_logo"</span></div><div class="line">       <span class="attr">android:insetBottom</span>=<span class="string">"10dp"</span></div><div class="line">       <span class="attr">android:insetLeft</span>=<span class="string">"50dp"</span></div><div class="line">       <span class="attr">android:insetRight</span>=<span class="string">"50dp"</span></div><div class="line">       <span class="attr">android:insetTop</span>=<span class="string">"10dp"</span>&gt;</div><div class="line"></div><div class="line"><span class="tag">&lt;/<span class="name">inset</span>&gt;</span></div></pre></td></tr></table></figure>
+<h2 id="裁剪可绘制对象"><a href="#裁剪可绘制对象" class="headerlink" title="裁剪可绘制对象"></a>裁剪可绘制对象</h2><p>在 XML 文件中定义的对其他可绘制对象进行裁剪（根据其当前级别）的可绘制对象。根据级别以及用于控制其在整个容器中位置的重力，来控制子可绘制对象的裁剪宽度和高度。常用于进度条以及图片渐进式显示。</p>
+<h3 id="语法-6"><a href="#语法-6" class="headerlink" title="语法"></a>语法</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version="1.0" encoding="utf-8"?&gt;</div><div class="line"><span class="tag">&lt;<span class="name">clip</span></span></div><div class="line">    <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span></div><div class="line">    <span class="attr">android:drawable</span>=<span class="string">"@drawable/drawable_resource"</span></div><div class="line">    <span class="attr">android:clipOrientation</span>=<span class="string">[</span>"<span class="attr">horizontal</span>" | "<span class="attr">vertical</span>"]</div><div class="line">    <span class="attr">android:gravity</span>=<span class="string">[</span>"<span class="attr">top</span>" | "<span class="attr">bottom</span>" | "<span class="attr">left</span>" | "<span class="attr">right</span>" | "<span class="attr">center_vertical</span>" |</div><div class="line">                     "<span class="attr">fill_vertical</span>" | "<span class="attr">center_horizontal</span>" | "<span class="attr">fill_horizontal</span>" |</div><div class="line">                     "<span class="attr">center</span>" | "<span class="attr">fill</span>" | "<span class="attr">clip_vertical</span>" | "<span class="attr">clip_horizontal</span>"] /&gt;</div></pre></td></tr></table></figure>
+<h3 id="元素-3"><a href="#元素-3" class="headerlink" title="元素"></a>元素</h3><ul>
+<li>clip 必须为根元素。</li>
+<li>android:clipOrientation 裁剪方向，横向和纵向。</li>
+<li>android:gravity 要裁减的位置</li>
+</ul>
+<blockquote>
+<p>注：默认级别为 0，即完全裁剪，使图像不可见。当级别为 10,000 时，图像不会裁剪，而是完全可见。</p>
+<h2 id="缩放可绘制对象"><a href="#缩放可绘制对象" class="headerlink" title="缩放可绘制对象"></a><a href="#缩放可绘制对象" title="缩放可绘制对象"></a>缩放可绘制对象</h2><p>在 XML 文件中定义的更改其他可绘制对象大小（根据其当前级别）的可绘制对象。编译时生成<code>ScaleDrawable</code>对象。</p>
+</blockquote>
+<h3 id="语法-7"><a href="#语法-7" class="headerlink" title="语法"></a>语法</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version="1.0" encoding="utf-8"?&gt;</div><div class="line"><span class="tag">&lt;<span class="name">scale</span></span></div><div class="line">    <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span></div><div class="line">    <span class="attr">android:drawable</span>=<span class="string">"@drawable/drawable_resource"</span></div><div class="line">    <span class="attr">android:scaleGravity</span>=<span class="string">[</span>"<span class="attr">top</span>" | "<span class="attr">bottom</span>" | "<span class="attr">left</span>" | "<span class="attr">right</span>" | "<span class="attr">center_vertical</span>" |</div><div class="line">                          "<span class="attr">fill_vertical</span>" | "<span class="attr">center_horizontal</span>" | "<span class="attr">fill_horizontal</span>" |</div><div class="line">                          "<span class="attr">center</span>" | "<span class="attr">fill</span>" | "<span class="attr">clip_vertical</span>" | "<span class="attr">clip_horizontal</span>"]</div><div class="line">    <span class="attr">android:scaleHeight</span>=<span class="string">"percentage"</span></div><div class="line">    <span class="attr">android:scaleWidth</span>=<span class="string">"percentage"</span> /&gt;</div></pre></td></tr></table></figure>
+<h3 id="元素-4"><a href="#元素-4" class="headerlink" title="元素"></a>元素</h3><ul>
+<li><code>scale</code> 定义缩放可绘制对象，必须为根元素。</li>
+<li><code>android:scaleGravity</code> 指定缩放后的重力位置。</li>
+<li><code>android:scaleHeight</code> 百分比。缩放高度，表示为可绘制对象边界的百分比。值的格式为 XX%。例如：100%、12.5% 等。</li>
+<li><code>android:scaleWidth</code> 百分比。缩放宽度，表示为可绘制对象边界的百分比</li>
+</ul>
+<h2 id="形状可绘制对象"><a href="#形状可绘制对象" class="headerlink" title="形状可绘制对象"></a>形状可绘制对象</h2><p>常用于绘制边框，渐变色等。编译时生成<code>GradientDrawable</code>对象。</p>
+<h3 id="语法-8"><a href="#语法-8" class="headerlink" title="语法"></a>语法</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version="1.0" encoding="utf-8"?&gt;</div><div class="line"><span class="tag">&lt;<span class="name">shape</span></span></div><div class="line">    <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span></div><div class="line">    <span class="attr">android:shape</span>=<span class="string">[</span>"<span class="attr">rectangle</span>" | "<span class="attr">oval</span>" | "<span class="attr">line</span>" | "<span class="attr">ring</span>"] &gt;</div><div class="line">    <span class="tag">&lt;<span class="name">corners</span></span></div><div class="line">        <span class="attr">android:radius</span>=<span class="string">"integer"</span></div><div class="line">        <span class="attr">android:topLeftRadius</span>=<span class="string">"integer"</span></div><div class="line">        <span class="attr">android:topRightRadius</span>=<span class="string">"integer"</span></div><div class="line">        <span class="attr">android:bottomLeftRadius</span>=<span class="string">"integer"</span></div><div class="line">        <span class="attr">android:bottomRightRadius</span>=<span class="string">"integer"</span> /&gt;</div><div class="line">    <span class="tag">&lt;<span class="name">gradient</span></span></div><div class="line">        <span class="attr">android:angle</span>=<span class="string">"integer"</span></div><div class="line">        <span class="attr">android:centerX</span>=<span class="string">"float"</span></div><div class="line">        <span class="attr">android:centerY</span>=<span class="string">"float"</span></div><div class="line">        <span class="attr">android:centerColor</span>=<span class="string">"integer"</span></div><div class="line">        <span class="attr">android:endColor</span>=<span class="string">"color"</span></div><div class="line">        <span class="attr">android:gradientRadius</span>=<span class="string">"integer"</span></div><div class="line">        <span class="attr">android:startColor</span>=<span class="string">"color"</span></div><div class="line">        <span class="attr">android:type</span>=<span class="string">[</span>"<span class="attr">linear</span>" | "<span class="attr">radial</span>" | "<span class="attr">sweep</span>"]</div><div class="line">        <span class="attr">android:useLevel</span>=<span class="string">[</span>"<span class="attr">true</span>" | "<span class="attr">false</span>"] /&gt;</div><div class="line">    <span class="tag">&lt;<span class="name">padding</span></span></div><div class="line">        <span class="attr">android:left</span>=<span class="string">"integer"</span></div><div class="line">        <span class="attr">android:top</span>=<span class="string">"integer"</span></div><div class="line">        <span class="attr">android:right</span>=<span class="string">"integer"</span></div><div class="line">        <span class="attr">android:bottom</span>=<span class="string">"integer"</span> /&gt;</div><div class="line">    <span class="tag">&lt;<span class="name">size</span></span></div><div class="line">        <span class="attr">android:width</span>=<span class="string">"integer"</span></div><div class="line">        <span class="attr">android:height</span>=<span class="string">"integer"</span> /&gt;</div><div class="line">    <span class="tag">&lt;<span class="name">solid</span></span></div><div class="line">        <span class="attr">android:color</span>=<span class="string">"color"</span> /&gt;</div><div class="line">    <span class="tag">&lt;<span class="name">stroke</span></span></div><div class="line">        <span class="attr">android:width</span>=<span class="string">"integer"</span></div><div class="line">        <span class="attr">android:color</span>=<span class="string">"color"</span></div><div class="line">        <span class="attr">android:dashWidth</span>=<span class="string">"integer"</span></div><div class="line">        <span class="attr">android:dashGap</span>=<span class="string">"integer"</span> /&gt;</div><div class="line"><span class="tag">&lt;/<span class="name">shape</span>&gt;</span></div></pre></td></tr></table></figure>
+<h3 id="元素-5"><a href="#元素-5" class="headerlink" title="元素"></a>元素</h3><ul>
+<li><code>shape</code>形状可绘制对象,跟标签。</li>
+<li><p><code>android:shape</code> 定义形状的类型</p>
+<ul>
+<li><code>rectangle</code> 填充包含视图的矩形。这是默认形状。</li>
+<li><code>oval</code> 适应包含视图尺寸的椭圆形状。</li>
+<li><code>line</code> 跨越包含视图宽度的水平线。此形状需要 <stroke>元素定义线宽。</stroke></li>
+<li><code>ring</code> 环形<ul>
+<li><code>android:innerRadius</code> 尺寸。环内部（中间的孔）的半径，以尺寸值或尺寸资源表示。当shape类型为<code>ring</code>时有效。</li>
+<li><code>android:innerRadiusRatio</code> 环内部的半径，以环宽度的比率表示。例如，如果 android:innerRadiusRatio=”5”，则内半径等于环宽度除以 5。此值被 android:innerRadius 覆盖。默认值为 9。当shape类型为<code>ring</code>时有效。</li>
+<li><code>android:thickness</code> 环的厚度。当shape类型为<code>ring</code>时有效。</li>
+<li><code>android:thicknessRatio</code> 环的厚度，表示为环宽度的比率。例如，如果 android:thicknessRatio=”2”，则厚度等于环宽度除以 2。此值被 android:innerRadius 覆盖。默认值为 3。当shape类型为<code>ring</code>时有效。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><code>corners</code> 为形状产生圆角。仅当形状为矩形时适用。</p>
+<ul>
+<li><p>角半径 <code>android:radius</code>,<code>android:topLeftRadius</code>,<code>android:topRightRadius</code>,<code>android:bottomLeftRadius</code>,<code>android:bottomRightRadius</code></p>
+<blockquote>
+<p>注：（最初）必须为每个角提供大于 1 的角半径，否则无法产生圆角。如果希望特定角不要倒圆角，解决方法是使用 android:radius 设置大于 1 的默认角半径，然后使用实际所需的值替换每个角，为不希望倒圆角的角提供零（“0dp”）</p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li><p><code>gradient</code> 形状的渐变颜色</p>
+<ul>
+<li><code>android:angle</code> 渐变的角度（度）。0 为从左到右，90 为从上到上。必须是 45 的倍数。默认为0，即水平方向。</li>
+<li><code>android:centerX</code> 渐变中心的相对 X 轴位置 (0 - 1.0)。</li>
+<li><code>android:centerY</code> 渐变中心的相对 Y 轴位置 (0 - 1.0)。</li>
+<li><code>android:centerColor</code>起始颜色与结束颜色之间的可选颜色，以十六进制值或颜色资源表示。</li>
+<li><code>android:endColor</code> 结束颜色，表示为十六进制值或颜色资源。</li>
+<li><code>android:gradientRadius</code> 渐变的半径。仅在 android:type=”radial” 时适用。</li>
+<li><code>android:startColor</code> 起始颜色，表示为十六进制值或颜色资源。</li>
+<li><code>android:type</code> 要应用的渐变图案的类型</li>
+<li><code>linear</code> 线性渐变。这是默认值。</li>
+<li><code>radial</code> 径向渐变。起始颜色为中心颜色。</li>
+<li><code>sweep</code> 流线型渐变。</li>
+</ul>
+</li>
+<li><code>padding</code> 要应用到包含视图元素的内边距(这会填充视图内容的位置，而非形状)。</li>
+<li><code>size</code> 形状的大小</li>
+</ul>
+<blockquote>
+<p>注：默认情况下，形状按照此处定义的尺寸按比例缩放至容器视图的大小。在 ImageView 中使用形状时，可通过将 android:scaleType 设置为 “center” 来限制缩放。</p>
+</blockquote>
+<ul>
+<li><code>solid</code> 填充色。指定在<code>android:color</code>中。</li>
+<li><code>stroke</code> 形状的笔划中线。<ul>
+<li><code>android:width</code>线宽。</li>
+<li><code>android:color</code>颜色</li>
+<li><code>android:dashGap</code> 短划线的间距</li>
+<li><code>android:dashWidth</code>短划线的大小</li>
+</ul>
+</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/04/28/Android 6.0模拟器上运行ARM架构程序/" rel="next" title="Android 6.0模拟器上运行ARM架构程序">
+                <i class="fa fa-chevron-left"></i> Android 6.0模拟器上运行ARM架构程序
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/05/02/使用CAEmitter粒子发射器实现类似饿了么下拉刷新的效果/" rel="prev" title="使用CAEmitter粒子发射器实现类似饿了么下拉刷新的效果">
+                使用CAEmitter粒子发射器实现类似饿了么下拉刷新的效果 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="Reddick" />
+          <p class="site-author-name" itemprop="name">Reddick</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">50</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#序"><span class="nav-number">1.</span> <span class="nav-text">序</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#位图文件"><span class="nav-number">1.1.</span> <span class="nav-text">位图文件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#资源引用："><span class="nav-number">1.1.1.</span> <span class="nav-text">资源引用：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例"><span class="nav-number">1.1.2.</span> <span class="nav-text">示例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#XML位图"><span class="nav-number">1.1.3.</span> <span class="nav-text">XML位图</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#语法"><span class="nav-number">1.1.3.1.</span> <span class="nav-text">语法</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#元素"><span class="nav-number">1.1.3.1.1.</span> <span class="nav-text">元素</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#九宫格文件"><span class="nav-number">1.2.</span> <span class="nav-text">九宫格文件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#XML九宫格"><span class="nav-number">1.2.1.</span> <span class="nav-text">XML九宫格</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#语法-1"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">语法</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#图层列表"><span class="nav-number">1.3.</span> <span class="nav-text">图层列表</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#语法-2"><span class="nav-number">1.3.1.</span> <span class="nav-text">语法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#状态列表"><span class="nav-number">1.3.2.</span> <span class="nav-text">状态列表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#语法-3"><span class="nav-number">1.3.3.</span> <span class="nav-text">语法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#元素-1"><span class="nav-number">1.3.4.</span> <span class="nav-text">元素</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例-1"><span class="nav-number">1.3.5.</span> <span class="nav-text">示例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#级别列表"><span class="nav-number">1.4.</span> <span class="nav-text">级别列表</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#语法-4"><span class="nav-number">1.4.1.</span> <span class="nav-text">语法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#元素-2"><span class="nav-number">1.4.2.</span> <span class="nav-text">元素</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例-2"><span class="nav-number">1.4.3.</span> <span class="nav-text">示例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#转换可绘制对象"><span class="nav-number">1.5.</span> <span class="nav-text">转换可绘制对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#插入可绘制对象"><span class="nav-number">1.6.</span> <span class="nav-text">插入可绘制对象</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#语法-5"><span class="nav-number">1.6.1.</span> <span class="nav-text">语法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例-3"><span class="nav-number">1.6.2.</span> <span class="nav-text">示例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#裁剪可绘制对象"><span class="nav-number">1.7.</span> <span class="nav-text">裁剪可绘制对象</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#语法-6"><span class="nav-number">1.7.1.</span> <span class="nav-text">语法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#元素-3"><span class="nav-number">1.7.2.</span> <span class="nav-text">元素</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#缩放可绘制对象"><span class="nav-number">1.8.</span> <span class="nav-text">缩放可绘制对象</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#语法-7"><span class="nav-number">1.8.1.</span> <span class="nav-text">语法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#元素-4"><span class="nav-number">1.8.2.</span> <span class="nav-text">元素</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#形状可绘制对象"><span class="nav-number">1.9.</span> <span class="nav-text">形状可绘制对象</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#语法-8"><span class="nav-number">1.9.1.</span> <span class="nav-text">语法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#元素-5"><span class="nav-number">1.9.2.</span> <span class="nav-text">元素</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Reddick</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("Ol4oMp1FneQ7gWrMKhYQLsFq-gzGzoHsz", "H57pffrWdrCIfFwrTaa4lwln");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

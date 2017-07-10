@@ -1,0 +1,816 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="google-site-verification" content="NeTdZhGK6vi-W-fSpXVdSlfNQxHkZUzcjoDUnNyoLDw" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="iOS," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="AFNetworking作为一款开源iOS网络请求框架，收到了广大iOS Developers的喜爱，它可以轻松的实现各种网络请求，处理上传下载以及网络异常。本文主要探讨AFNetworking中的内存管理问题，不对如何使用AFNetworking做探讨。在AFNetwoking3.0后，AFNetworking基于NSURLSession进行封装而非NSURLConnection，因此最低的支持">
+<meta name="keywords" content="iOS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="谈谈AFNetwoking中的内存管理">
+<meta property="og:url" content="http://reddick-wang.github.io/2016/12/12/谈谈AFNetwoking中的内存管理/index.html">
+<meta property="og:site_name" content="Reddick">
+<meta property="og:description" content="AFNetworking作为一款开源iOS网络请求框架，收到了广大iOS Developers的喜爱，它可以轻松的实现各种网络请求，处理上传下载以及网络异常。本文主要探讨AFNetworking中的内存管理问题，不对如何使用AFNetworking做探讨。在AFNetwoking3.0后，AFNetworking基于NSURLSession进行封装而非NSURLConnection，因此最低的支持">
+<meta property="og:updated_time" content="2017-06-27T10:49:46.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="谈谈AFNetwoking中的内存管理">
+<meta name="twitter:description" content="AFNetworking作为一款开源iOS网络请求框架，收到了广大iOS Developers的喜爱，它可以轻松的实现各种网络请求，处理上传下载以及网络异常。本文主要探讨AFNetworking中的内存管理问题，不对如何使用AFNetworking做探讨。在AFNetwoking3.0后，AFNetworking基于NSURLSession进行封装而非NSURLConnection，因此最低的支持">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"hide","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://reddick-wang.github.io/2016/12/12/谈谈AFNetwoking中的内存管理/"/>
+
+
+
+
+
+  <title>谈谈AFNetwoking中的内存管理 | Reddick</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Reddick</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-sitemap">
+          <a href="/sitemap.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            站点地图
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://reddick-wang.github.io/2016/12/12/谈谈AFNetwoking中的内存管理/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Reddick">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Reddick">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">谈谈AFNetwoking中的内存管理</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-12-12T14:52:10+08:00">
+                2016-12-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2016/12/12/谈谈AFNetwoking中的内存管理/" class="leancloud_visitors" data-flag-title="谈谈AFNetwoking中的内存管理">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>AFNetworking作为一款开源iOS网络请求框架，收到了广大iOS Developers的喜爱，它可以轻松的实现各种网络请求，处理上传下载以及网络异常。<br>本文主要探讨AFNetworking中的内存管理问题，不对如何使用AFNetworking做探讨。<br>在AFNetwoking3.0后，AFNetworking基于NSURLSession进行封装而非NSURLConnection，因此最低的支持版本为7.0.<br>在官方的例子中我们可以看到这样的例子：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">NSURL</span> *URL = [<span class="built_in">NSURL</span> URLWithString:<span class="string">@"http://example.com/resources/123.json"</span>];</div><div class="line">AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];</div><div class="line">[manager GET:URL.absoluteString parameters:<span class="literal">nil</span> progress:<span class="literal">nil</span> success:^(<span class="built_in">NSURLSessionTask</span> *task, <span class="keyword">id</span> responseObject) &#123;</div><div class="line">    <span class="built_in">NSLog</span>(<span class="string">@"JSON: %@"</span>, responseObject);</div><div class="line">&#125; failure:^(<span class="built_in">NSURLSessionTask</span> *operation, <span class="built_in">NSError</span> *error) &#123;</div><div class="line"><span class="built_in">NSLog</span>(<span class="string">@"Error: %@"</span>, error);</div><div class="line">&#125;];</div></pre></td></tr></table></figure>
+<p>可以看到主要的网络请求是在<code>AFHTTPSessionManager</code>类中处理的。<code>AFHTTPSessionManager</code>继承自<code>AFURLSessionManager</code>,在AFHTTPSessionManager中会调用<code>[super initWithSessionConfiguration:configuration]</code>方法创建一些必要的类，以下是AFURLSessionManager中的初始化代码:</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div></pre></td><td class="code"><pre><div class="line">- (<span class="keyword">instancetype</span>)initWithSessionConfiguration:(<span class="built_in">NSURLSessionConfiguration</span> *)configuration &#123;</div><div class="line">       <span class="keyword">self</span> = [<span class="keyword">super</span> init];</div><div class="line">    <span class="keyword">if</span> (!<span class="keyword">self</span>) &#123;</div><div class="line">        <span class="keyword">return</span> <span class="literal">nil</span>;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (!configuration) &#123;</div><div class="line">        configuration = [<span class="built_in">NSURLSessionConfiguration</span> defaultSessionConfiguration];</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">self</span>.sessionConfiguration = configuration;</div><div class="line"></div><div class="line">    <span class="keyword">self</span>.operationQueue = [[<span class="built_in">NSOperationQueue</span> alloc] init];</div><div class="line">    <span class="keyword">self</span>.operationQueue.maxConcurrentOperationCount = <span class="number">1</span>;</div><div class="line"></div><div class="line">    <span class="keyword">self</span>.session = [<span class="built_in">NSURLSession</span> sessionWithConfiguration:<span class="keyword">self</span>.sessionConfiguration delegate:<span class="keyword">self</span> delegateQueue:<span class="keyword">self</span>.operationQueue];</div><div class="line"></div><div class="line">    <span class="keyword">self</span>.responseSerializer = [AFJSONResponseSerializer serializer];</div><div class="line"></div><div class="line">    <span class="keyword">self</span>.securityPolicy = [AFSecurityPolicy defaultPolicy];</div><div class="line"></div><div class="line">    <span class="meta">#if !TARGET_OS_WATCH</span></div><div class="line">    <span class="keyword">self</span>.reachabilityManager = [AFNetworkReachabilityManager sharedManager];</div><div class="line">    <span class="meta">#endif</span></div><div class="line"></div><div class="line">    <span class="keyword">self</span>.mutableTaskDelegatesKeyedByTaskIdentifier = [[<span class="built_in">NSMutableDictionary</span> alloc] init];</div><div class="line"></div><div class="line">    <span class="keyword">self</span>.lock = [[<span class="built_in">NSLock</span> alloc] init];</div><div class="line">    <span class="keyword">self</span>.lock.name = AFURLSessionManagerLockName;</div><div class="line"></div><div class="line">    [<span class="keyword">self</span>.session getTasksWithCompletionHandler:^(<span class="built_in">NSArray</span> *dataTasks, <span class="built_in">NSArray</span> *uploadTasks, <span class="built_in">NSArray</span> *downloadTasks) &#123;</div><div class="line">        <span class="keyword">for</span> (<span class="built_in">NSURLSessionDataTask</span> *task <span class="keyword">in</span> dataTasks) &#123;</div><div class="line">            [<span class="keyword">self</span> addDelegateForDataTask:task uploadProgress:<span class="literal">nil</span> downloadProgress:<span class="literal">nil</span> completionHandler:<span class="literal">nil</span>];</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="keyword">for</span> (<span class="built_in">NSURLSessionUploadTask</span> *uploadTask <span class="keyword">in</span> uploadTasks) &#123;</div><div class="line">            [<span class="keyword">self</span> addDelegateForUploadTask:uploadTask progress:<span class="literal">nil</span> completionHandler:<span class="literal">nil</span>];</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="keyword">for</span> (<span class="built_in">NSURLSessionDownloadTask</span> *downloadTask <span class="keyword">in</span> downloadTasks) &#123;</div><div class="line">            [<span class="keyword">self</span> addDelegateForDownloadTask:downloadTask progress:<span class="literal">nil</span> destination:<span class="literal">nil</span> completionHandler:<span class="literal">nil</span>];</div><div class="line">        &#125;</div><div class="line">    &#125;];</div><div class="line"></div><div class="line">    <span class="keyword">return</span> <span class="keyword">self</span>;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>在manager创建之初，会创建NSURLSessionConfiguration，NSURLSession，以及线程队列以及线程锁等。manager会为每一个task创建一个AFURLSessionManagerTaskDelegate类，并将delegate存储在自己的mutableTaskDelegatesKeyedByTaskIdentifier字典中，其中task的identifier作为字典的键名。delegate会处理session中的部分回调，delegate使用弱引用持有AFURLSessionManager，在sessiontask完成时会通过session的代理方式将得到的结果返回给AFURLSessionManager类，AFURLSessionManager通过寻找字典中的identifier找到对应的AFURLSessionManagerTaskDelegate，由于delegate中包裹了manager请求时的回调block，网络请求的结果会通过delegate的所持有的代码块返回。然而由于NSURLSession的Delegate是strong类型的，而manager也会强持有自己的session，因此，二者会因为相互持有而得不到释放，该问题可以在instrument 的leak中查看到，两者的相互持有产生了孤岛效应。</p>
+<p>在网上看到很多人将AFNetwoking的<code>manager</code>封装成类方法，这种写法是不正确的，因为这样会造成内存泄漏的问题，虽然很小，但是不可否认的是确实出现了内存泄漏，如果在代码块中也持有了大量的内存，会使app的内存无法被释放掉的问题。在AFNetwoking的issue中，作者建议将AFNetwoking封装成单例使用，但是这种方式增加了取消网络请求的难度，需要记住上一次请求的url，然后执行取消操作。</p>
+<p>如果你的网络请求会多次调用<code>- manager</code>方法，那么正确的做法是在网络请求完成(请求成功或者失败)后在一个合适的时机manually释放掉manager，AFSessionManager提供了一个手动关闭session的方法：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> Invalidates the managed session, optionally canceling pending tasks.</div><div class="line"></div><div class="line"> @param cancelPendingTasks Whether or not to cancel pending tasks.</div><div class="line"> */</div><div class="line"></div><div class="line">- (<span class="keyword">void</span>)invalidateSessionCancelingTasks:(<span class="built_in">BOOL</span>)cancelPendingTasks;</div></pre></td></tr></table></figure>
+<p>例如，对于只请求一次的代码，可以这样写：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">__<span class="keyword">weak</span> <span class="keyword">typeof</span>(*&amp;<span class="keyword">self</span>) wself = <span class="keyword">self</span>;</div><div class="line"><span class="built_in">NSURL</span> *URL = [<span class="built_in">NSURL</span> URLWithString:<span class="string">@"http://example.com/resources/123.json"</span>];  </div><div class="line">__block AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];</div><div class="line">[manager GET:URL.absoluteString parameters:<span class="literal">nil</span> progress:<span class="literal">nil</span> success:^(<span class="built_in">NSURLSessionTask</span> *task, <span class="keyword">id</span> responseObject) &#123;</div><div class="line">     __<span class="keyword">strong</span> <span class="keyword">typeof</span>(*&amp;wself) sself = wself;</div><div class="line">     [sself dosomething];</div><div class="line">    <span class="built_in">NSLog</span>(<span class="string">@"JSON: %@"</span>, responseObject);</div><div class="line">    [manager invalidateSessionCancelingTasks:<span class="literal">YES</span>];</div><div class="line">    manager = <span class="literal">nil</span>;</div><div class="line">&#125; failure:^(<span class="built_in">NSURLSessionTask</span> *operation, <span class="built_in">NSError</span> *error) &#123;</div><div class="line">        __<span class="keyword">strong</span> <span class="keyword">typeof</span>(*&amp;wself) sself = wself;</div><div class="line">     [sself dosomething];</div><div class="line">    <span class="built_in">NSLog</span>(<span class="string">@"Error: %@"</span>, error);</div><div class="line">    [manager invalidateSessionCancelingTasks:<span class="literal">YES</span>];</div><div class="line">    manager = <span class="literal">nil</span>;</div><div class="line">&#125;];</div></pre></td></tr></table></figure>
+<p>如果一个manager会请求多个url请求，那么可以封装到<code>UIViewController</code>类及其子类中，这样在dealloc中手动的释放掉manager便可以了。</p>
+<p>以上便是个人对于AFNetwoking内存管理的总结，如果你有什么更好的建议或者意见.</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS/" rel="tag"># iOS</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/08/08/iOS命令行打包app(二)/" rel="next" title="iOS命令行打包app(二)">
+                <i class="fa fa-chevron-left"></i> iOS命令行打包app(二)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/12/13/Mac常用命令集锦/" rel="prev" title="Mac常用命令集锦">
+                Mac常用命令集锦 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview sidebar-panel sidebar-panel-active">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="Reddick" />
+          <p class="site-author-name" itemprop="name">Reddick</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">50</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Reddick</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("Ol4oMp1FneQ7gWrMKhYQLsFq-gzGzoHsz", "H57pffrWdrCIfFwrTaa4lwln");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

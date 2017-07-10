@@ -275,7 +275,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://reddick-wang.github.io/2016/02/16/iOS-mutiple-delegate-with-NSProxy/">
+    <link itemprop="mainEntityOfPage" href="http://reddick-wang.github.io/2016/02/16/mutiple-delegates-leaning/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Reddick">
@@ -294,7 +294,7 @@
         
           <h2 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2016/02/16/iOS-mutiple-delegate-with-NSProxy/" itemprop="url">iOS多播代理(二)</a></h2>
+                <a class="post-title-link" href="/2016/02/16/mutiple-delegates-leaning/" itemprop="url">iOS多播代理 (一)</a></h2>
         
 
         <div class="post-meta">
@@ -324,7 +324,7 @@
 
           
           
-             <span id="/2016/02/16/iOS-mutiple-delegate-with-NSProxy/" class="leancloud_visitors" data-flag-title="iOS多播代理(二)">
+             <span id="/2016/02/16/mutiple-delegates-leaning/" class="leancloud_visitors" data-flag-title="iOS多播代理 (一)">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -354,12 +354,18 @@
       
         
           
-          使用NSProxy实现多播代理NSProxy 是Objective-C的另一个根类，是一个虚类，本身仅有几个创建方法和NSObject协议，调用任何其他方法都会触发消息转发机制，所以他是实现多播代理和模拟多继承的更好的方式。
-因为NSProxy本身是一个虚类，甚至连init方法都没有，所以我们在创建
+          概述在iOS中实现回调的方法大概有以下几种：
+
+协议代理
+通知中心
+匿名函数
+KVO键值观察
+
+在使用中，一对一的回调以上四种都可以实现，而对于一对多，范围大的回调，一般都会采用通知中心。 然而苹果的通知中心的实现在多线程编程时是有问题的，即通知的接收者所接收的通知有可能并不是在发出通知的线程上，这
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2016/02/16/iOS-mutiple-delegate-with-NSProxy/#more" rel="contents">
+            <a class="btn" href="/2016/02/16/mutiple-delegates-leaning/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -405,7 +411,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://reddick-wang.github.io/2016/02/12/iOS-mutiple-thread-development-NSOperation/">
+    <link itemprop="mainEntityOfPage" href="http://reddick-wang.github.io/2016/02/12/mutiple-thread-development-NSOperation/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Reddick">
@@ -424,7 +430,7 @@
         
           <h2 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2016/02/12/iOS-mutiple-thread-development-NSOperation/" itemprop="url">多线程开发（NSOperation篇）</a></h2>
+                <a class="post-title-link" href="/2016/02/12/mutiple-thread-development-NSOperation/" itemprop="url">多线程开发（NSOperation篇）</a></h2>
         
 
         <div class="post-meta">
@@ -454,7 +460,7 @@
 
           
           
-             <span id="/2016/02/12/iOS-mutiple-thread-development-NSOperation/" class="leancloud_visitors" data-flag-title="多线程开发（NSOperation篇）">
+             <span id="/2016/02/12/mutiple-thread-development-NSOperation/" class="leancloud_visitors" data-flag-title="多线程开发（NSOperation篇）">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -489,7 +495,7 @@
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2016/02/12/iOS-mutiple-thread-development-NSOperation/#more" rel="contents">
+            <a class="btn" href="/2016/02/12/mutiple-thread-development-NSOperation/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -535,7 +541,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://reddick-wang.github.io/2016/02/09/iOS-mutiple-thread-development-GCD/">
+    <link itemprop="mainEntityOfPage" href="http://reddick-wang.github.io/2016/02/09/mutiple-thread-development-GCD/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Reddick">
@@ -554,7 +560,7 @@
         
           <h2 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2016/02/09/iOS-mutiple-thread-development-GCD/" itemprop="url">iOS 多线程开发(GCD进阶篇)</a></h2>
+                <a class="post-title-link" href="/2016/02/09/mutiple-thread-development-GCD/" itemprop="url">iOS 多线程开发(GCD进阶篇)</a></h2>
         
 
         <div class="post-meta">
@@ -584,7 +590,7 @@
 
           
           
-             <span id="/2016/02/09/iOS-mutiple-thread-development-GCD/" class="leancloud_visitors" data-flag-title="iOS 多线程开发(GCD进阶篇)">
+             <span id="/2016/02/09/mutiple-thread-development-GCD/" class="leancloud_visitors" data-flag-title="iOS 多线程开发(GCD进阶篇)">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -618,7 +624,7 @@
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2016/02/09/iOS-mutiple-thread-development-GCD/#more" rel="contents">
+            <a class="btn" href="/2016/02/09/mutiple-thread-development-GCD/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -664,7 +670,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://reddick-wang.github.io/2016/02/07/iOS-mutiple-thread-development-1/">
+    <link itemprop="mainEntityOfPage" href="http://reddick-wang.github.io/2016/02/07/mutiple-thread-development-1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Reddick">
@@ -683,7 +689,7 @@
         
           <h2 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2016/02/07/iOS-mutiple-thread-development-1/" itemprop="url">iOS多线程开发(一)</a></h2>
+                <a class="post-title-link" href="/2016/02/07/mutiple-thread-development-1/" itemprop="url">iOS多线程开发(一)</a></h2>
         
 
         <div class="post-meta">
@@ -713,7 +719,7 @@
 
           
           
-             <span id="/2016/02/07/iOS-mutiple-thread-development-1/" class="leancloud_visitors" data-flag-title="iOS多线程开发(一)">
+             <span id="/2016/02/07/mutiple-thread-development-1/" class="leancloud_visitors" data-flag-title="iOS多线程开发(一)">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -745,7 +751,7 @@
           <h3 id="POSIX线程"><a href="#POSIX线程" class="headerlink" title="POSIX线程"></a>POSIX线程</h3><p>POSIX线程是UNIX创建线程的方式，偏于底层。<br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2016/02/07/iOS-mutiple-thread-development-1/#more" rel="contents">
+            <a class="btn" href="/2016/02/07/mutiple-thread-development-1/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -791,7 +797,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://reddick-wang.github.io/2016/01/31/iOS-使用脚本打包app/">
+    <link itemprop="mainEntityOfPage" href="http://reddick-wang.github.io/2016/01/31/使用脚本打包app/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Reddick">
@@ -810,7 +816,7 @@
         
           <h2 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2016/01/31/iOS-使用脚本打包app/" itemprop="url">使用脚本打包app</a></h2>
+                <a class="post-title-link" href="/2016/01/31/使用脚本打包app/" itemprop="url">使用脚本打包app</a></h2>
         
 
         <div class="post-meta">
@@ -862,7 +868,7 @@
 
           
           
-             <span id="/2016/01/31/iOS-使用脚本打包app/" class="leancloud_visitors" data-flag-title="使用脚本打包app">
+             <span id="/2016/01/31/使用脚本打包app/" class="leancloud_visitors" data-flag-title="使用脚本打包app">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -899,7 +905,7 @@ xcodebuild
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2016/01/31/iOS-使用脚本打包app/#more" rel="contents">
+            <a class="btn" href="/2016/01/31/使用脚本打包app/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -945,7 +951,7 @@ xcodebuild
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://reddick-wang.github.io/2016/01/16/iOS-版本宏的那些事/">
+    <link itemprop="mainEntityOfPage" href="http://reddick-wang.github.io/2016/01/16/编写可变参数函数/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Reddick">
@@ -964,7 +970,7 @@ xcodebuild
         
           <h2 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2016/01/16/iOS-版本宏的那些事/" itemprop="url">iOS 版本宏的那些事</a></h2>
+                <a class="post-title-link" href="/2016/01/16/编写可变参数函数/" itemprop="url">编写可变参数函数</a></h2>
         
 
         <div class="post-meta">
@@ -994,136 +1000,7 @@ xcodebuild
 
           
           
-             <span id="/2016/01/16/iOS-版本宏的那些事/" class="leancloud_visitors" data-flag-title="iOS 版本宏的那些事">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数 </span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          iOS 的版本宏定义在usr/include文件夹下，主要包括Availability.h,AvailabilityInternal.h和AvailabilityMacros.h三个文件。主要作用便是在编译期对不同版本的iOS做出一些特殊的处理。在Availability.h文件中我们可以看到大量的
-          ...
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2016/01/16/iOS-版本宏的那些事/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://reddick-wang.github.io/2016/01/16/iOS-编写可变参数函数/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Reddick">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Reddick">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h2 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2016/01/16/iOS-编写可变参数函数/" itemprop="url">iOS-编写可变参数函数</a></h2>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-01-16T09:07:43+08:00">
-                2016-01-16
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/2016/01/16/iOS-编写可变参数函数/" class="leancloud_visitors" data-flag-title="iOS-编写可变参数函数">
+             <span id="/2016/01/16/编写可变参数函数/" class="leancloud_visitors" data-flag-title="编写可变参数函数">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -1157,7 +1034,7 @@ xcodebuild
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2016/01/16/iOS-编写可变参数函数/#more" rel="contents">
+            <a class="btn" href="/2016/01/16/编写可变参数函数/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1203,7 +1080,7 @@ xcodebuild
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://reddick-wang.github.io/2015/10/01/iOS-国际化与本地化/">
+    <link itemprop="mainEntityOfPage" href="http://reddick-wang.github.io/2016/01/16/版本宏的那些事/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Reddick">
@@ -1222,7 +1099,136 @@ xcodebuild
         
           <h2 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2015/10/01/iOS-国际化与本地化/" itemprop="url">iOS国际化与本地化</a></h2>
+                <a class="post-title-link" href="/2016/01/16/版本宏的那些事/" itemprop="url">版本宏的那些事</a></h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-01-16T09:07:43+08:00">
+                2016-01-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2016/01/16/版本宏的那些事/" class="leancloud_visitors" data-flag-title="版本宏的那些事">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          iOS 的版本宏定义在usr/include文件夹下，主要包括Availability.h,AvailabilityInternal.h和AvailabilityMacros.h三个文件。主要作用便是在编译期对不同版本的iOS做出一些特殊的处理。在Availability.h文件中我们可以看到大量的
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2016/01/16/版本宏的那些事/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://reddick-wang.github.io/2015/10/01/iOS中的国际化与本地化/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Reddick">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Reddick">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2015/10/01/iOS中的国际化与本地化/" itemprop="url">iOS中的国际化与本地化</a></h2>
         
 
         <div class="post-meta">
@@ -1252,7 +1258,7 @@ xcodebuild
 
           
           
-             <span id="/2015/10/01/iOS-国际化与本地化/" class="leancloud_visitors" data-flag-title="iOS国际化与本地化">
+             <span id="/2015/10/01/iOS中的国际化与本地化/" class="leancloud_visitors" data-flag-title="iOS中的国际化与本地化">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -1290,7 +1296,7 @@ xcodebuild
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2015/10/01/iOS-国际化与本地化/#more" rel="contents">
+            <a class="btn" href="/2015/10/01/iOS中的国际化与本地化/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1336,7 +1342,7 @@ xcodebuild
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://reddick-wang.github.io/2015/09/15/iOS-控制器转场场切换/">
+    <link itemprop="mainEntityOfPage" href="http://reddick-wang.github.io/2015/09/15/控制器转场场切换/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Reddick">
@@ -1355,7 +1361,7 @@ xcodebuild
         
           <h2 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2015/09/15/iOS-控制器转场场切换/" itemprop="url">iOS开发之控制器转场场切换</a></h2>
+                <a class="post-title-link" href="/2015/09/15/控制器转场场切换/" itemprop="url">控制器转场场切换</a></h2>
         
 
         <div class="post-meta">
@@ -1385,7 +1391,7 @@ xcodebuild
 
           
           
-             <span id="/2015/09/15/iOS-控制器转场场切换/" class="leancloud_visitors" data-flag-title="iOS开发之控制器转场场切换">
+             <span id="/2015/09/15/控制器转场场切换/" class="leancloud_visitors" data-flag-title="控制器转场场切换">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -1423,7 +1429,7 @@ PresentModal(模态视图),主要用于收集用户输入信息、临时呈现�
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2015/09/15/iOS-控制器转场场切换/#more" rel="contents">
+            <a class="btn" href="/2015/09/15/控制器转场场切换/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1469,7 +1475,7 @@ PresentModal(模态视图),主要用于收集用户输入信息、临时呈现�
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://reddick-wang.github.io/2015/09/01/iOS-reveal-tutorial/">
+    <link itemprop="mainEntityOfPage" href="http://reddick-wang.github.io/2015/09/01/reveal-tutorial/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Reddick">
@@ -1488,7 +1494,7 @@ PresentModal(模态视图),主要用于收集用户输入信息、临时呈现�
         
           <h2 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2015/09/01/iOS-reveal-tutorial/" itemprop="url">reveal app入门</a></h2>
+                <a class="post-title-link" href="/2015/09/01/reveal-tutorial/" itemprop="url">reveal app入门</a></h2>
         
 
         <div class="post-meta">
@@ -1518,7 +1524,7 @@ PresentModal(模态视图),主要用于收集用户输入信息、临时呈现�
 
           
           
-             <span id="/2015/09/01/iOS-reveal-tutorial/" class="leancloud_visitors" data-flag-title="reveal app入门">
+             <span id="/2015/09/01/reveal-tutorial/" class="leancloud_visitors" data-flag-title="reveal app入门">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -1553,7 +1559,7 @@ PresentModal(模态视图),主要用于收集用户输入信息、临时呈现�
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2015/09/01/iOS-reveal-tutorial/#more" rel="contents">
+            <a class="btn" href="/2015/09/01/reveal-tutorial/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>

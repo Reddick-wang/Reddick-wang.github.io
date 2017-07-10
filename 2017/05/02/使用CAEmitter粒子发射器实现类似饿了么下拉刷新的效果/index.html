@@ -1,0 +1,848 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="google-site-verification" content="NeTdZhGK6vi-W-fSpXVdSlfNQxHkZUzcjoDUnNyoLDw" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="iOS," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="序本文是动画效果效果的一些实践，使用CAEmitterLayer实现类似于饿了么下拉刷新的效果。 构思饿了么的下拉刷新可以分为3部分，正常状态，预刷新状态和刷新状态，我们只需要处理这三种状态，然后将控件结合MJRefresh等开源的刷新库使用，便可实现饿了么下拉刷新的效果，当然MJRefresh如何使用不是本文的重点，可以去官网学习如何使用。 正常状态这种状态下我们需要处理的视图的创建，放在UIV">
+<meta name="keywords" content="iOS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用CAEmitter粒子发射器实现类似饿了么下拉刷新的效果">
+<meta property="og:url" content="http://reddick-wang.github.io/2017/05/02/使用CAEmitter粒子发射器实现类似饿了么下拉刷新的效果/index.html">
+<meta property="og:site_name" content="Reddick">
+<meta property="og:description" content="序本文是动画效果效果的一些实践，使用CAEmitterLayer实现类似于饿了么下拉刷新的效果。 构思饿了么的下拉刷新可以分为3部分，正常状态，预刷新状态和刷新状态，我们只需要处理这三种状态，然后将控件结合MJRefresh等开源的刷新库使用，便可实现饿了么下拉刷新的效果，当然MJRefresh如何使用不是本文的重点，可以去官网学习如何使用。 正常状态这种状态下我们需要处理的视图的创建，放在UIV">
+<meta property="og:updated_time" content="2017-06-27T10:49:32.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用CAEmitter粒子发射器实现类似饿了么下拉刷新的效果">
+<meta name="twitter:description" content="序本文是动画效果效果的一些实践，使用CAEmitterLayer实现类似于饿了么下拉刷新的效果。 构思饿了么的下拉刷新可以分为3部分，正常状态，预刷新状态和刷新状态，我们只需要处理这三种状态，然后将控件结合MJRefresh等开源的刷新库使用，便可实现饿了么下拉刷新的效果，当然MJRefresh如何使用不是本文的重点，可以去官网学习如何使用。 正常状态这种状态下我们需要处理的视图的创建，放在UIV">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"hide","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://reddick-wang.github.io/2017/05/02/使用CAEmitter粒子发射器实现类似饿了么下拉刷新的效果/"/>
+
+
+
+
+
+  <title>使用CAEmitter粒子发射器实现类似饿了么下拉刷新的效果 | Reddick</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Reddick</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-sitemap">
+          <a href="/sitemap.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            站点地图
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://reddick-wang.github.io/2017/05/02/使用CAEmitter粒子发射器实现类似饿了么下拉刷新的效果/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Reddick">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Reddick">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">使用CAEmitter粒子发射器实现类似饿了么下拉刷新的效果</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-02T20:34:01+08:00">
+                2017-05-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2017/05/02/使用CAEmitter粒子发射器实现类似饿了么下拉刷新的效果/" class="leancloud_visitors" data-flag-title="使用CAEmitter粒子发射器实现类似饿了么下拉刷新的效果">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="序"><a href="#序" class="headerlink" title="序"></a>序</h2><p>本文是动画效果效果的一些实践，使用<code>CAEmitterLayer</code>实现类似于饿了么下拉刷新的效果。</p>
+<h2 id="构思"><a href="#构思" class="headerlink" title="构思"></a>构思</h2><p>饿了么的下拉刷新可以分为3部分，正常状态，预刷新状态和刷新状态，我们只需要处理这三种状态，然后将控件结合MJRefresh等开源的刷新库使用，便可实现饿了么下拉刷新的效果，当然MJRefresh如何使用不是本文的重点，可以去官网学习如何使用。</p>
+<h3 id="正常状态"><a href="#正常状态" class="headerlink" title="正常状态"></a>正常状态</h3><p>这种状态下我们需要处理的视图的创建，放在UIView的<code>initWithFrame</code>方法中，正常状态下会有一个logo和一个底部阴影，这两个视图使用layer去创建即可，并没有什么难度。</p>
+<h3 id="预加载状态"><a href="#预加载状态" class="headerlink" title="预加载状态"></a>预加载状态</h3><p>当下拉的高度未达到刷新的状态时，logo的两侧会显示两个把手，在正常状态下，两个把手会隐藏，随着下拉的距离渐渐张开，到一定程度后不会再进行旋转了。</p>
+<h3 id="刷新状态"><a href="#刷新状态" class="headerlink" title="刷新状态"></a>刷新状态</h3><p>刷新状态下，logo中会不断向外面”扔出”水果，把手上下摆动，同时箱子会发生形变行为。</p>
+<h3 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h3><p>下载饿了么的app，解压包，找到刷新的资源文件。实际的图片内容在<code>NVMUIKit.bundle</code>目录下，将相关图片拷贝到工程中。主要的资源文件只需要几个，背景logo、底部阴影、食物的图片，左右两个把手。</p>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><h3 id="正常状态-1"><a href="#正常状态-1" class="headerlink" title="正常状态"></a>正常状态</h3><p>首先我们需要处理的是正常状态下的显示，该部分代码可以放在<code>initWithFrame:(CGRect)frame</code>中，主要进行控件的初始化工作。代码如下：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div></pre></td><td class="code"><pre><div class="line">- (<span class="keyword">instancetype</span>)initWithFrame:(<span class="built_in">CGRect</span>)frame &#123;</div><div class="line"><span class="keyword">if</span> (<span class="keyword">self</span> = [<span class="keyword">super</span> initWithFrame:frame]) &#123;</div><div class="line">    <span class="keyword">self</span>.layer.masksToBounds = <span class="literal">YES</span>;</div><div class="line"></div><div class="line">    <span class="built_in">CALayer</span> *leftHandle = [<span class="built_in">CALayer</span> layer];</div><div class="line">    leftHandle.contents = (__bridge <span class="keyword">id</span> _Nullable)([<span class="built_in">UIImage</span> imageNamed:<span class="string">@"pull_to_refresh_box_left_handle"</span>].CGImage);</div><div class="line">    leftHandle.anchorPoint = <span class="built_in">CGPointMake</span>(<span class="number">0</span>, <span class="number">0</span>);</div><div class="line">    <span class="keyword">self</span>.leftHandle = leftHandle;</div><div class="line">    [<span class="keyword">self</span>.layer addSublayer:leftHandle];</div><div class="line"></div><div class="line">    <span class="built_in">CALayer</span> *rightHandle = [<span class="built_in">CALayer</span> layer];</div><div class="line">    rightHandle.contents = (__bridge <span class="keyword">id</span> _Nullable)([<span class="built_in">UIImage</span> imageNamed:<span class="string">@"pull_to_refresh_box_right_handle"</span>].CGImage);</div><div class="line">    <span class="keyword">self</span>.rightHandle = rightHandle;</div><div class="line">    [<span class="keyword">self</span>.layer addSublayer:rightHandle];</div><div class="line"></div><div class="line">    <span class="built_in">CALayer</span> *shader = [<span class="built_in">CALayer</span> layer];</div><div class="line">    shader.contents = (__bridge <span class="keyword">id</span> _Nullable)([<span class="built_in">UIImage</span> imageNamed:<span class="string">@"pull_to_refresh_box_shade"</span>].CGImage);</div><div class="line">    _boxShade = shader;</div><div class="line">    [<span class="keyword">self</span>.layer addSublayer:shader];</div><div class="line"></div><div class="line">    <span class="built_in">CALayer</span> *background = [<span class="built_in">CALayer</span> layer];</div><div class="line">    background.contents = (__bridge <span class="keyword">id</span> _Nullable)([<span class="built_in">UIImage</span> imageNamed:<span class="string">@"pull_to_refresh_box"</span>].CGImage);</div><div class="line">    _background = background;</div><div class="line"></div><div class="line">    <span class="built_in">CGFloat</span> height = <span class="keyword">self</span>.frame.size.height;</div><div class="line">    <span class="built_in">CGFloat</span> width = <span class="keyword">self</span>.frame.size.width;</div><div class="line">    <span class="built_in">CGPoint</span> center = <span class="built_in">CGPointMake</span>(width*<span class="number">0.5</span>, height*<span class="number">0.5</span>);</div><div class="line"></div><div class="line">    <span class="built_in">CAEmitterLayer</span> *emitter = [<span class="built_in">CAEmitterLayer</span> layer];</div><div class="line">    emitter.emitterMode = kCAEmitterLayerOutline;</div><div class="line"></div><div class="line">    [<span class="keyword">self</span>.layer addSublayer:background];</div><div class="line">    _background.frame = <span class="built_in">CGRectMake</span>(center.x - <span class="number">31</span>, center.y - <span class="number">24</span>, <span class="number">62</span>, <span class="number">48</span>);</div><div class="line">    _boxShade.frame = <span class="built_in">CGRectMake</span>(center.x - <span class="number">35</span>,center.y + <span class="number">14</span>, <span class="number">70</span>, <span class="number">18</span>);</div><div class="line">    _leftHandle.position = <span class="built_in">CGPointMake</span>(_background.frame.origin.x +<span class="number">2</span> , _background.frame.origin.y + <span class="number">3</span>);</div><div class="line">    _leftHandle.bounds = <span class="built_in">CGRectMake</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">30</span>, <span class="number">5</span>);</div><div class="line">    _leftHandle.anchorPoint = <span class="built_in">CGPointMake</span>(<span class="number">0</span>, <span class="number">0</span>);</div><div class="line">    _rightHandle.position = <span class="built_in">CGPointMake</span>(_background.frame.origin.x + _background.bounds.size.width - <span class="number">2</span> ,_background.frame.origin.y +<span class="number">3</span>);</div><div class="line">    _rightHandle.bounds = <span class="built_in">CGRectMake</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">30</span>, <span class="number">5</span>);</div><div class="line">    _rightHandle.anchorPoint = <span class="built_in">CGPointMake</span>(<span class="number">1.0</span>, <span class="number">0</span>);</div><div class="line">&#125;</div><div class="line"><span class="keyword">return</span> <span class="keyword">self</span>;</div></pre></td></tr></table></figure>
+<p>}</p>
+<h3 id="依据下拉的距离处理把手的旋转"><a href="#依据下拉的距离处理把手的旋转" class="headerlink" title="依据下拉的距离处理把手的旋转"></a>依据下拉的距离处理把手的旋转</h3><p>处理把手的旋转需要知道当前的下拉进度，这里面我们只需要百分比，所以编写函数<code>- (void)transformWithProgress:(CGFloat)progress layer:(CALayer *)layer</code>来处理把手的旋转：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">- (<span class="keyword">void</span>)transformWithProgress:(<span class="built_in">CGFloat</span>)progress layer:(<span class="built_in">CALayer</span> *)layer &#123;</div><div class="line">    layer.transform = <span class="built_in">CATransform3DMakeRotation</span>(progress * M_PI * <span class="number">2</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="刷新进行时"><a href="#刷新进行时" class="headerlink" title="刷新进行时"></a>刷新进行时</h3><p>在下拉刷新时logo会不断的产生食物，并向外弹出，logo形变，把手上下摆动。食物的效果我们这里可以采用CAEmitterLayer处理，部分代码如下：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">_emitterLayer = emitter;</div><div class="line">_emitterLayer.birthRate = <span class="number">2.8</span>f;</div><div class="line">_emitterLayer.emitterPosition = center;</div><div class="line">[<span class="keyword">self</span>.layer addSublayer:_emitterLayer];</div></pre></td></tr></table></figure>
+<p>创建EmitterCell的方法如下</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">- (<span class="built_in">NSArray</span> *)createEmitter &#123;</div><div class="line">    <span class="built_in">CAEmitterCell</span> *orange = [<span class="keyword">self</span> createEmitterCellWithImage:[<span class="built_in">UIImage</span> imageNamed:<span class="string">@"pull_to_refresh_element_g1_1"</span>] direction:EmitterDirectionLeft];</div><div class="line">    <span class="built_in">CAEmitterCell</span> *hanberger = [<span class="keyword">self</span> createEmitterCellWithImage:[<span class="built_in">UIImage</span> imageNamed:<span class="string">@"pull_to_refresh_element_g1_2"</span>] direction:EmitterDirectionRight];</div><div class="line">    <span class="built_in">CAEmitterCell</span> *unKnown = [<span class="keyword">self</span> createEmitterCellWithImage:[<span class="built_in">UIImage</span> imageNamed:<span class="string">@"pull_to_refresh_element_g1_3"</span>] direction:EmitterDirectionLeft];</div><div class="line">    <span class="built_in">CAEmitterCell</span> *pear = [<span class="keyword">self</span> createEmitterCellWithImage:[<span class="built_in">UIImage</span> imageNamed:<span class="string">@"pull_to_refresh_element_g1_5"</span>] direction:EmitterDirectionRight];</div><div class="line">    <span class="keyword">return</span> @[orange,hanberger,unKnown,pear];</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (<span class="built_in">NSArray</span> *)emitterCells &#123;</div><div class="line">    <span class="keyword">if</span> (_emitterCells == <span class="literal">nil</span>) &#123;</div><div class="line">        _emitterCells = [<span class="keyword">self</span> createEmitter];</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> _emitterCells;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="整合显示"><a href="#整合显示" class="headerlink" title="整合显示"></a>整合显示</h3><p>依据当前进度的百分比控制显示：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">- (<span class="keyword">void</span>)setProgress:(<span class="built_in">CGFloat</span>)progress &#123;</div><div class="line">    _progress = progress;</div><div class="line">    <span class="keyword">if</span> (_progress == <span class="number">0.0</span>) &#123;</div><div class="line">        _leftHandle.hidden = <span class="literal">YES</span>;</div><div class="line">        _rightHandle.hidden = <span class="literal">YES</span>;</div><div class="line">    &#125;<span class="keyword">else</span> <span class="keyword">if</span>(_progress &lt; <span class="number">0.7</span>) &#123;</div><div class="line">        _leftHandle.hidden = <span class="literal">NO</span>;</div><div class="line">        _rightHandle.hidden = <span class="literal">NO</span>;</div><div class="line">        [<span class="keyword">self</span> transformWithProgress:_progress layer:_rightHandle];</div><div class="line">        [<span class="keyword">self</span> transformWithProgress:-_progress layer:_leftHandle];</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">if</span>(_progress &gt; <span class="number">0.8</span>) &#123;</div><div class="line">        <span class="keyword">if</span> ([<span class="keyword">self</span>.emitterLayer.emitterCells count]&gt;<span class="number">0</span>) &#123; <span class="keyword">return</span>;&#125;</div><div class="line">        <span class="keyword">self</span>.emitterLayer.emitterCells = <span class="keyword">self</span>.emitterCells;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">else</span> &#123;</div><div class="line">        <span class="keyword">self</span>.emitterLayer.emitterCells = @[];</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="属性及枚举定义"><a href="#属性及枚举定义" class="headerlink" title="属性及枚举定义"></a><a href="#属性及枚举定义" title="属性及枚举定义"></a>属性及枚举定义</h3><figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">typedef</span> <span class="built_in">NS_ENUM</span>(<span class="built_in">NSInteger</span>,EmitterDirection)&#123;</div><div class="line">    EmitterDirectionLeft,</div><div class="line">    EmitterDirectionRight,</div><div class="line">&#125;;</div><div class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">ELAnimationView</span> ()</span></div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>,<span class="keyword">weak</span>) <span class="built_in">CALayer</span> *boxShade;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>,<span class="keyword">weak</span>) <span class="built_in">CALayer</span> *background;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>,<span class="keyword">weak</span>) <span class="built_in">CALayer</span> *leftHandle;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>,<span class="keyword">weak</span>) <span class="built_in">CALayer</span> *rightHandle;</div><div class="line"></div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>,<span class="keyword">assign</span>) <span class="built_in">CGFloat</span> progress;</div><div class="line"></div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>,<span class="keyword">weak</span>)<span class="built_in">CAEmitterLayer</span> *emitterLayer;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>,<span class="keyword">copy</span>)<span class="built_in">NSArray</span> *emitterCells;</div><div class="line"></div><div class="line"><span class="keyword">@end</span></div></pre></td></tr></table></figure>
+<h3 id="实践效果及结束语"><a href="#实践效果及结束语" class="headerlink" title="实践效果及结束语"></a>实践效果及结束语</h3><p><iframe height="200" width="200" src="http://7xq0yv.com1.z0.glb.clouddn.com/eleme-like-refresh-animation.mov">&lt;p&gt;本例仅仅是仿饿了么的下拉刷新的部分动画，未实现所有功能，因为在实践的过程中发现了如下几个问题：&lt;/p&gt; &lt;ul&gt; &lt;li&gt;&lt;code&gt;CAEmitterCell&lt;/code&gt;无法动态的改变其内部的contents，如果一旦改变，已经发射的粒子也会随之变动，并且饿了么的实际动画效果是一个一个食物弹出的，而非多个粒子一起弹出，还是略微有些差别。&lt;/li&gt; &lt;li&gt;无法处理logo的弹跳动作，这个效果留在下一篇博客中去实现。&lt;/li&gt; &lt;li&gt;未处理左右把手的摇摆动画。&lt;/li&gt; &lt;/ul&gt; &lt;p&gt;不过即便如此，我们不是也学会如何使用粒子发射器了么～。&lt;/p&gt;</iframe></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS/" rel="tag"># iOS</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/04/28/Android学习笔记之可绘制对象资源/" rel="next" title="Android学习笔记之可绘制对象资源">
+                <i class="fa fa-chevron-left"></i> Android学习笔记之可绘制对象资源
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/05/08/饿了么下拉刷新效果的实现(二)/" rel="prev" title="饿了么下拉刷新效果的实现(二)">
+                饿了么下拉刷新效果的实现(二) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="Reddick" />
+          <p class="site-author-name" itemprop="name">Reddick</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">50</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#序"><span class="nav-number">1.</span> <span class="nav-text">序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#构思"><span class="nav-number">2.</span> <span class="nav-text">构思</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#正常状态"><span class="nav-number">2.1.</span> <span class="nav-text">正常状态</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#预加载状态"><span class="nav-number">2.2.</span> <span class="nav-text">预加载状态</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#刷新状态"><span class="nav-number">2.3.</span> <span class="nav-text">刷新状态</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#准备"><span class="nav-number">2.4.</span> <span class="nav-text">准备</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现"><span class="nav-number">3.</span> <span class="nav-text">实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#正常状态-1"><span class="nav-number">3.1.</span> <span class="nav-text">正常状态</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#依据下拉的距离处理把手的旋转"><span class="nav-number">3.2.</span> <span class="nav-text">依据下拉的距离处理把手的旋转</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#刷新进行时"><span class="nav-number">3.3.</span> <span class="nav-text">刷新进行时</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#整合显示"><span class="nav-number">3.4.</span> <span class="nav-text">整合显示</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#属性及枚举定义"><span class="nav-number">3.5.</span> <span class="nav-text">属性及枚举定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实践效果及结束语"><span class="nav-number">3.6.</span> <span class="nav-text">实践效果及结束语</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Reddick</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("Ol4oMp1FneQ7gWrMKhYQLsFq-gzGzoHsz", "H57pffrWdrCIfFwrTaa4lwln");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
