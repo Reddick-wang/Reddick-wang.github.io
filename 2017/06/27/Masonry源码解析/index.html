@@ -1,0 +1,899 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="google-site-verification" content="NeTdZhGK6vi-W-fSpXVdSlfNQxHkZUzcjoDUnNyoLDw" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="iOS,开源框架," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="简介Masonry是一款轻量级的布局框架，基于NSLayoutConstraint，使用链式语法结构，避免了NSLayoutConstraint又长又繁琐的语法结构，同时阅读方便。支持iOS和OSX。github地址：,目前Masonry仅支持Objective-C语言，如果你的工程是基于swift工程构建的，可以选择SnapKit作为布局框架。 为什么选择Masonry首先要理解iOS中常用的布">
+<meta name="keywords" content="iOS,开源框架">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Masonry源码解析">
+<meta property="og:url" content="http://reddick-wang.github.io/2017/06/27/Masonry源码解析/index.html">
+<meta property="og:site_name" content="Reddick">
+<meta property="og:description" content="简介Masonry是一款轻量级的布局框架，基于NSLayoutConstraint，使用链式语法结构，避免了NSLayoutConstraint又长又繁琐的语法结构，同时阅读方便。支持iOS和OSX。github地址：,目前Masonry仅支持Objective-C语言，如果你的工程是基于swift工程构建的，可以选择SnapKit作为布局框架。 为什么选择Masonry首先要理解iOS中常用的布">
+<meta property="og:updated_time" content="2017-07-10T08:15:07.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Masonry源码解析">
+<meta name="twitter:description" content="简介Masonry是一款轻量级的布局框架，基于NSLayoutConstraint，使用链式语法结构，避免了NSLayoutConstraint又长又繁琐的语法结构，同时阅读方便。支持iOS和OSX。github地址：,目前Masonry仅支持Objective-C语言，如果你的工程是基于swift工程构建的，可以选择SnapKit作为布局框架。 为什么选择Masonry首先要理解iOS中常用的布">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"hide","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://reddick-wang.github.io/2017/06/27/Masonry源码解析/"/>
+
+
+
+
+
+  <title>Masonry源码解析 | Reddick</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Reddick</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-sitemap">
+          <a href="/sitemap.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            站点地图
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://reddick-wang.github.io/2017/06/27/Masonry源码解析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Reddick">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Reddick">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">Masonry源码解析</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-27T22:00:07+08:00">
+                2017-06-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2017/06/27/Masonry源码解析/" class="leancloud_visitors" data-flag-title="Masonry源码解析">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>Masonry是一款轻量级的布局框架，基于<code>NSLayoutConstraint</code>，使用链式语法结构，避免了<code>NSLayoutConstraint</code>又长又繁琐的语法结构，同时阅读方便。支持iOS和OSX。<br><a href="https://github.com/SnapKit/Masonry" target="_blank" rel="external">github地址：</a>,目前Masonry仅支持Objective-C语言，如果你的工程是基于swift工程构建的，可以选择<a href="https://github.com/SnapKit/SnapKit" target="_blank" rel="external">SnapKit</a>作为布局框架。</p>
+<h2 id="为什么选择Masonry"><a href="#为什么选择Masonry" class="headerlink" title="为什么选择Masonry"></a>为什么选择Masonry</h2><p>首先要理解iOS中常用的布局手段，基于Frame的绝对布局手段，以及基于Autolayout的相对布局手段，Autolayout中还分为使用XIB和Storyboard的拖拽布局手段以及上面提到的基于代码的<code>NSLayoutConstraint</code>手写约束布局。<br>两种布局方式可以说各有优缺点，基于frame的布局方式灵活，早期的iOS开发都是基于frame的开发，手写frame的速度快，性能更优，但是当面对当前复杂的多屏幕适配时便显得有些捉襟见肘了，特别是一些动态高度，复杂文本的显示上，基于frame的布局方式不是很方便。<br>Autolayout的出现便是为了解决frame布局方式很难处理的问题，相对布局是基于另一个对象的位置来计算本身的位置，所以当另一个View视图的大小或位置约束发生改变时，该View的位置和大小也会基于条件而发生改变。这样就免去了我们在一个View视图位置发生改变时，需要去处理View的布局的逻辑。<br>因为Autolayout是基于动态计算的，所以其性能对比与frame布局会差一些，但是这些毫秒级的布局本身并不会引起太大的性能差异。<br>既然Autolayout能解决该问题，为什么还要选择基于<code>Masonry</code>框架而不是基于<code>NSLayoutConstraint</code>本身呢，对于拖拽式的XIB和Storyboard，其开发的方便性和快捷毋庸置疑，但是XIB和Storyboard在代码管控上不是很方便，并且这种布局不适合动画效果较多的UI界面，而基于代码编写<code>NSLayoutConstraint</code>虽然没有XIB和Storyboard的上述问题，但是其写法过于冗长，并不是很友好。由此Masonry应运而生。</p>
+<h2 id="Masonry的使用"><a href="#Masonry的使用" class="headerlink" title="Masonry的使用"></a>Masonry的使用</h2><p>关于Masonry如何使用，网上有很多教程，这里就不做过多介绍了，Masonry主要提供了三个函数来处理视图的布局：</p>
+<ul>
+<li><code>mas_updateConstraints</code> 通过该函数可以为视图处理添加布局约束。<br>示例： </li>
+</ul>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[topView makeConstraints:^(MASConstraintMaker *make) &#123;</div><div class="line">        make.top.equalTo(<span class="keyword">self</span>.mas_topLayoutGuide);</div><div class="line">        make.left.equalTo(<span class="keyword">self</span>.view);</div><div class="line">        make.right.equalTo(<span class="keyword">self</span>.view);</div><div class="line">        make.height.equalTo(@<span class="number">40</span>);</div><div class="line">    &#125;];</div></pre></td></tr></table></figure>
+<ul>
+<li><code>updateConstraints</code> 通过该函数可以更新视图的约束布局，注意是更新，而不是创建新的约束关系。</li>
+<li><code>mas_remakeConstraints</code> 通过该函数可以重新生成新的约束，并移除之前的约束。</li>
+</ul>
+<h2 id="Masonry的结构"><a href="#Masonry的结构" class="headerlink" title="Masonry的结构"></a>Masonry的结构</h2><h3 id="View-MASAdditions"><a href="#View-MASAdditions" class="headerlink" title="View+MASAdditions"></a>View+MASAdditions</h3><p>为什么会起名是View的Category，因为Masonry需要支持iOS和OSX(iOS下使用UIView,而OSX下使用NSView).因此可以看到该文件中的分类名是一个<code>MAS_VIEW</code>宏，定义在MASUtilities.h中，在预编译阶段依据编译的平台生成View的类。<br>简化版如下</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#if TARGET_OS_IPHONE || TARGET_OS_TV</span></div><div class="line"></div><div class="line">    <span class="meta">#import <span class="meta-string">&lt;UIKit/UIKit.h&gt;</span></span></div><div class="line">    <span class="meta">#define MAS_VIEW UIView</span></div><div class="line">    <span class="meta">#define MAS_VIEW_CONTROLLER UIViewController</span></div><div class="line">    <span class="meta">#define MASEdgeInsets UIEdgeInsets</span></div><div class="line"><span class="meta">#elif TARGET_OS_MAC</span></div><div class="line"></div><div class="line">    <span class="meta">#import <span class="meta-string">&lt;AppKit/AppKit.h&gt;</span></span></div><div class="line">    <span class="meta">#define MAS_VIEW NSView</span></div><div class="line"></div><div class="line"><span class="meta">#endif</span></div><div class="line">``` </div><div class="line">该类是我们最常用的类，Masonry的常用方法都定义在了该类中。该类提供了创建对该视图创建约束的一种封装类`MASViewAttribute`类，并提供了View视图所有可用约束的`MASViewAttribute`对象。</div><div class="line">部分源码如下:</div><div class="line"></div><div class="line">``` objc</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>, <span class="keyword">readonly</span>) MASViewAttribute *mas_left;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>, <span class="keyword">readonly</span>) MASViewAttribute *mas_top;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>, <span class="keyword">readonly</span>) MASViewAttribute *mas_right;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>, <span class="keyword">readonly</span>) MASViewAttribute *mas_bottom;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>, <span class="keyword">readonly</span>) MASViewAttribute *mas_leading;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>, <span class="keyword">readonly</span>) MASViewAttribute *mas_trailing;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>, <span class="keyword">readonly</span>) MASViewAttribute *mas_width;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>, <span class="keyword">readonly</span>) MASViewAttribute *mas_height;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>, <span class="keyword">readonly</span>) MASViewAttribute *mas_centerX;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>, <span class="keyword">readonly</span>) MASViewAttribute *mas_centerY;</div></pre></td></tr></table></figure>
+<p>我们常用的<code>mas_updateConstraints</code>等方法都定义在该分类中，后面会详细介绍整个使用流程。</p>
+<h3 id="View-MASShorthandAdditions"><a href="#View-MASShorthandAdditions" class="headerlink" title="View+MASShorthandAdditions"></a>View+MASShorthandAdditions</h3><p>该分类主要处理一个<code>MAS_SHORTHAND</code>宏定义,使用了该宏定义可以省略的很多方法中的mas前缀，无关紧要。主要用途是防止与一些其他类库的冲突。</p>
+<h3 id="ViewController-MASAdditions"><a href="#ViewController-MASAdditions" class="headerlink" title="ViewController+MASAdditions"></a>ViewController+MASAdditions</h3><p>与View+MASAdditions的功能类似，不做详细介绍。</p>
+<h3 id="NSArray-MASAdditions"><a href="#NSArray-MASAdditions" class="headerlink" title="NSArray+MASAdditions"></a>NSArray+MASAdditions</h3><p>该Category是一个NSArray的Category，为View视图数组提供了便捷添加、移除、更新约束的方法。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">- (<span class="built_in">NSArray</span> *)mas_makeConstraints:(<span class="keyword">void</span>(^)(MASConstraintMaker *make))block &#123;</div><div class="line">    <span class="built_in">NSMutableArray</span> *constraints = [<span class="built_in">NSMutableArray</span> array];</div><div class="line">    <span class="keyword">for</span> (MAS_VIEW *view <span class="keyword">in</span> <span class="keyword">self</span>) &#123;</div><div class="line">        <span class="built_in">NSAssert</span>([view isKindOfClass:[MAS_VIEW <span class="keyword">class</span>]], <span class="string">@"All objects in the array must be views"</span>);</div><div class="line">        [constraints addObjectsFromArray:[view mas_makeConstraints:block]];</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> constraints;</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (<span class="built_in">NSArray</span> *)mas_updateConstraints:(<span class="keyword">void</span>(^)(MASConstraintMaker *make))block &#123;</div><div class="line">    <span class="built_in">NSMutableArray</span> *constraints = [<span class="built_in">NSMutableArray</span> array];</div><div class="line">    <span class="keyword">for</span> (MAS_VIEW *view <span class="keyword">in</span> <span class="keyword">self</span>) &#123;</div><div class="line">        <span class="built_in">NSAssert</span>([view isKindOfClass:[MAS_VIEW <span class="keyword">class</span>]], <span class="string">@"All objects in the array must be views"</span>);</div><div class="line">        [constraints addObjectsFromArray:[view mas_updateConstraints:block]];</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> constraints;</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (<span class="built_in">NSArray</span> *)mas_remakeConstraints:(<span class="keyword">void</span>(^)(MASConstraintMaker *make))block &#123;</div><div class="line">    <span class="built_in">NSMutableArray</span> *constraints = [<span class="built_in">NSMutableArray</span> array];</div><div class="line">    <span class="keyword">for</span> (MAS_VIEW *view <span class="keyword">in</span> <span class="keyword">self</span>) &#123;</div><div class="line">        <span class="built_in">NSAssert</span>([view isKindOfClass:[MAS_VIEW <span class="keyword">class</span>]], <span class="string">@"All objects in the array must be views"</span>);</div><div class="line">        [constraints addObjectsFromArray:[view mas_remakeConstraints:block]];</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> constraints;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>三个函数只是名字和执行view的方法不同，可以利用宏写为如下:</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#define MAS_ArrayMaker(functionName) \</span></div><div class="line">- (<span class="built_in">NSArray</span> *)mas_<span class="meta">##functionName:(void(^)(MASConstraintMaker *make))block &#123;\</span></div><div class="line">    <span class="built_in">NSMutableArray</span> *constraints = [<span class="built_in">NSMutableArray</span> array];\</div><div class="line">    <span class="keyword">for</span> (MAS_VIEW *view <span class="keyword">in</span> <span class="keyword">self</span>) &#123; \</div><div class="line">        <span class="built_in">NSAssert</span>([view isKindOfClass:[MAS_VIEW <span class="keyword">class</span>]], <span class="string">@"All objects in the array must be views"</span>);\</div><div class="line">        [constraints addObjectsFromArray:[view mas_<span class="meta">##functionName:block]];\</span></div><div class="line">    &#125; \</div><div class="line">    <span class="keyword">return</span> constraints; \</div><div class="line">&#125;</div><div class="line"></div><div class="line">MAS_ArrayMaker(makeConstraints)</div><div class="line">MAS_ArrayMaker(updateConstraints);</div><div class="line">MAS_ArrayMaker(remakeConstraints);</div></pre></td></tr></table></figure>
+<h3 id="MASConstraint-约束抽象类"><a href="#MASConstraint-约束抽象类" class="headerlink" title="MASConstraint 约束抽象类"></a>MASConstraint 约束抽象类</h3><p><code>MASConstraint</code>是链式语法(chainable syntax)的核心,关于链式语法的解释，这里有一篇<a href="http://www.cocoachina.com/ios/20160224/15408.html" target="_blank" rel="external">很好的文章:</a>,<code>MASConstraint</code>类本身并不能直接使用，其本身类似于是一个抽象基类，由其两个子类实现了其功能。<br><code>MASConstraint</code>封装了<code>NSLayoutConstraint</code>类的功能，配合<code>MASConstraintMaker</code>可以生成任何约束。</p>
+<h4 id="MASViewConstraint"><a href="#MASViewConstraint" class="headerlink" title="MASViewConstraint"></a>MASViewConstraint</h4><p><code>MASViewConstraint</code>单个视图约束，有两个属性，第一个View视图和其约束类<code>MASViewAttribute</code>以及第二个View视图及其约束类<code>MASViewAttribute</code>，<br>并提供了一个初始化方法<code>- (id)initWithFirstViewAttribute:(MASViewAttribute *)firstViewAttribute;</code></p>
+<h5 id="获取一个View视图对象上的所有MASConstraint约束"><a href="#获取一个View视图对象上的所有MASConstraint约束" class="headerlink" title="获取一个View视图对象上的所有MASConstraint约束"></a>获取一个View视图对象上的所有MASConstraint约束</h5><figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">+ (<span class="built_in">NSArray</span> *)installedConstraintsForView:(MAS_VIEW *)view &#123;</div><div class="line">    <span class="keyword">return</span> [view.mas_installedConstraints allObjects];</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>MASViewConstraint中含有一个私有Category，该Category中为NSView/UIView动态添加了一个属性。在每次调用自身的<code>install</code>方法时会将自身添加到View视图对象的属性中。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">MAS_VIEW</span> (<span class="title">MASConstraints</span>)</span></div><div class="line"></div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">readonly</span>) <span class="built_in">NSMutableSet</span> *mas_installedConstraints;</div><div class="line"></div><div class="line"><span class="keyword">@end</span></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">MAS_VIEW</span> (<span class="title">MASConstraints</span>)</span></div><div class="line"></div><div class="line"><span class="keyword">static</span> <span class="keyword">char</span> kInstalledConstraintsKey;</div><div class="line"></div><div class="line">- (<span class="built_in">NSMutableSet</span> *)mas_installedConstraints &#123;</div><div class="line">    <span class="built_in">NSMutableSet</span> *constraints = objc_getAssociatedObject(<span class="keyword">self</span>, &amp;kInstalledConstraintsKey);</div><div class="line">    <span class="keyword">if</span> (!constraints) &#123;</div><div class="line">        constraints = [<span class="built_in">NSMutableSet</span> set];</div><div class="line">        objc_setAssociatedObject(<span class="keyword">self</span>, &amp;kInstalledConstraintsKey, constraints, OBJC_ASSOCIATION_RETAIN_NONATOMIC);</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> constraints;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">@end</span></div></pre></td></tr></table></figure>
+<h5 id="MASViewConstraint的私有属性"><a href="#MASViewConstraint的私有属性" class="headerlink" title="MASViewConstraint的私有属性"></a><code>MASViewConstraint</code>的私有属性</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">@interface MASViewConstraint ()</div><div class="line"></div><div class="line">@property (nonatomic, strong, readwrite) MASViewAttribute *secondViewAttribute;</div><div class="line">@property (nonatomic, weak) MAS_VIEW *installedView;</div><div class="line">@property (nonatomic, weak) MASLayoutConstraint *layoutConstraint;</div><div class="line">@property (nonatomic, assign) NSLayoutRelation layoutRelation;</div><div class="line">@property (nonatomic, assign) MASLayoutPriority layoutPriority;</div><div class="line">@property (nonatomic, assign) CGFloat layoutMultiplier;</div><div class="line">@property (nonatomic, assign) CGFloat layoutConstant;</div><div class="line">@property (nonatomic, assign) BOOL hasLayoutRelation;</div><div class="line">@property (nonatomic, strong) id mas_key;</div><div class="line">@property (nonatomic, assign) BOOL useAnimator;</div><div class="line">@end</div></pre></td></tr></table></figure>
+<p><br><code>MASViewConstraint</code>类本身持有一个<code>NSLayoutConstraint</code>对象，生成后会保存起来，并增加了一些封装方法。</p>
+<h5 id="判断是否为激活状态，对应于NSLayoutConstraint的active属性"><a href="#判断是否为激活状态，对应于NSLayoutConstraint的active属性" class="headerlink" title="判断是否为激活状态，对应于NSLayoutConstraint的active属性"></a>判断是否为激活状态，对应于<code>NSLayoutConstraint</code>的<code>active</code>属性</h5><figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">- (<span class="built_in">BOOL</span>)supportsActiveProperty &#123;</div><div class="line">    <span class="keyword">return</span> [<span class="keyword">self</span>.layoutConstraint respondsToSelector:<span class="keyword">@selector</span>(isActive)];</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (<span class="built_in">BOOL</span>)isActive &#123;</div><div class="line">    <span class="built_in">BOOL</span> active = <span class="literal">YES</span>;</div><div class="line">    <span class="keyword">if</span> ([<span class="keyword">self</span> supportsActiveProperty]) &#123;</div><div class="line">        active = [<span class="keyword">self</span>.layoutConstraint isActive];</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">return</span> active;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h5 id="是否已经存在"><a href="#是否已经存在" class="headerlink" title="是否已经存在"></a>是否已经存在</h5><figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">- (<span class="built_in">BOOL</span>)hasBeenInstalled &#123;</div><div class="line">    <span class="keyword">return</span> (<span class="keyword">self</span>.layoutConstraint != <span class="literal">nil</span>) &amp;&amp; [<span class="keyword">self</span> isActive];</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h5 id="等分方式layoutMultiplier，对应于NSLayoutConstraint的multiplier属性"><a href="#等分方式layoutMultiplier，对应于NSLayoutConstraint的multiplier属性" class="headerlink" title="等分方式layoutMultiplier，对应于NSLayoutConstraint的multiplier属性"></a>等分方式<code>layoutMultiplier</code>，对应于<code>NSLayoutConstraint</code>的<code>multiplier</code>属性</h5><figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">- (MASConstraint * (^)(<span class="built_in">CGFloat</span>))multipliedBy &#123;</div><div class="line">    <span class="keyword">return</span> ^<span class="keyword">id</span>(<span class="built_in">CGFloat</span> multiplier) &#123;</div><div class="line">        <span class="built_in">NSAssert</span>(!<span class="keyword">self</span>.hasBeenInstalled,</div><div class="line">                 <span class="string">@"Cannot modify constraint multiplier after it has been installed"</span>);</div><div class="line">        </div><div class="line">        <span class="keyword">self</span>.layoutMultiplier = multiplier;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">self</span>;</div><div class="line">    &#125;;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">- (MASConstraint * (^)(<span class="built_in">CGFloat</span>))dividedBy &#123;</div><div class="line">    <span class="keyword">return</span> ^<span class="keyword">id</span>(<span class="built_in">CGFloat</span> divider) &#123;</div><div class="line">        <span class="built_in">NSAssert</span>(!<span class="keyword">self</span>.hasBeenInstalled,</div><div class="line">                 <span class="string">@"Cannot modify constraint multiplier after it has been installed"</span>);</div><div class="line"></div><div class="line">        <span class="keyword">self</span>.layoutMultiplier = <span class="number">1.0</span>/divider;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">self</span>;</div><div class="line">    &#125;;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h5 id="优先级"><a href="#优先级" class="headerlink" title="优先级"></a>优先级</h5><figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line">- (MASConstraint * (^)(MASLayoutPriority))priority &#123;</div><div class="line">    <span class="keyword">return</span> ^<span class="keyword">id</span>(MASLayoutPriority priority) &#123;</div><div class="line">        <span class="built_in">NSAssert</span>(!<span class="keyword">self</span>.hasBeenInstalled,</div><div class="line">                 <span class="string">@"Cannot modify constraint priority after it has been installed"</span>);</div><div class="line">        </div><div class="line">        <span class="keyword">self</span>.layoutPriority = priority;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">self</span>;</div><div class="line">    &#125;;</div><div class="line">&#125;</div><div class="line"><span class="comment">//这几个方法写在了`MASConstraint`方法中共用</span></div><div class="line">- (MASConstraint * (^)())priorityLow &#123;</div><div class="line">    <span class="keyword">return</span> ^<span class="keyword">id</span>&#123;</div><div class="line">        <span class="keyword">self</span>.priority(MASLayoutPriorityDefaultLow);</div><div class="line">        <span class="keyword">return</span> <span class="keyword">self</span>;</div><div class="line">    &#125;;</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (MASConstraint * (^)())priorityMedium &#123;</div><div class="line">    <span class="keyword">return</span> ^<span class="keyword">id</span>&#123;</div><div class="line">        <span class="keyword">self</span>.priority(MASLayoutPriorityDefaultMedium);</div><div class="line">        <span class="keyword">return</span> <span class="keyword">self</span>;</div><div class="line">    &#125;;</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (MASConstraint * (^)())priorityHigh &#123;</div><div class="line">    <span class="keyword">return</span> ^<span class="keyword">id</span>&#123;</div><div class="line">        <span class="keyword">self</span>.priority(MASLayoutPriorityDefaultHigh);</div><div class="line">        <span class="keyword">return</span> <span class="keyword">self</span>;</div><div class="line">    &#125;;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h5 id="约束关系-lt-gt-…"><a href="#约束关系-lt-gt-…" class="headerlink" title="约束关系( \==,&lt;=,&gt;== …)"></a>约束关系( \==,&lt;=,&gt;== …)</h5><figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div></pre></td><td class="code"><pre><div class="line">- (MASConstraint * (^)(<span class="keyword">id</span>, <span class="built_in">NSLayoutRelation</span>))equalToWithRelation &#123;</div><div class="line">    <span class="keyword">return</span> ^<span class="keyword">id</span>(<span class="keyword">id</span> attribute, <span class="built_in">NSLayoutRelation</span> relation) &#123;</div><div class="line">        <span class="keyword">if</span> ([attribute isKindOfClass:<span class="built_in">NSArray</span>.class]) &#123;</div><div class="line">            <span class="built_in">NSAssert</span>(!<span class="keyword">self</span>.hasLayoutRelation, <span class="string">@"Redefinition of constraint relation"</span>);</div><div class="line">            <span class="built_in">NSMutableArray</span> *children = <span class="built_in">NSMutableArray</span>.new;</div><div class="line">            <span class="keyword">for</span> (<span class="keyword">id</span> attr <span class="keyword">in</span> attribute) &#123;</div><div class="line">                MASViewConstraint *viewConstraint = [<span class="keyword">self</span> <span class="keyword">copy</span>];</div><div class="line">                viewConstraint.layoutRelation = relation;</div><div class="line">                viewConstraint.secondViewAttribute = attr;</div><div class="line">                [children addObject:viewConstraint];</div><div class="line">            &#125;</div><div class="line">            MASCompositeConstraint *compositeConstraint = [[MASCompositeConstraint alloc] initWithChildren:children];</div><div class="line">            compositeConstraint.delegate = <span class="keyword">self</span>.delegate;</div><div class="line">            [<span class="keyword">self</span>.delegate constraint:<span class="keyword">self</span> shouldBeReplacedWithConstraint:compositeConstraint];</div><div class="line">            <span class="keyword">return</span> compositeConstraint;</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            <span class="built_in">NSAssert</span>(!<span class="keyword">self</span>.hasLayoutRelation || <span class="keyword">self</span>.layoutRelation == relation &amp;&amp; [attribute isKindOfClass:<span class="built_in">NSValue</span>.class], <span class="string">@"Redefinition of constraint relation"</span>);</div><div class="line">            <span class="keyword">self</span>.layoutRelation = relation;</div><div class="line">            <span class="keyword">self</span>.secondViewAttribute = attribute;</div><div class="line">            <span class="keyword">return</span> <span class="keyword">self</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">//这几个方法写在了`MASConstraint`方法中共用</span></div><div class="line"><span class="meta">#pragma mark - NSLayoutRelation proxies</span></div><div class="line"></div><div class="line">- (MASConstraint * (^)(<span class="keyword">id</span>))equalTo &#123;</div><div class="line">    <span class="keyword">return</span> ^<span class="keyword">id</span>(<span class="keyword">id</span> attribute) &#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">self</span>.equalToWithRelation(attribute, <span class="built_in">NSLayoutRelationEqual</span>);</div><div class="line">    &#125;;</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (MASConstraint * (^)(<span class="keyword">id</span>))mas_equalTo &#123;</div><div class="line">    <span class="keyword">return</span> ^<span class="keyword">id</span>(<span class="keyword">id</span> attribute) &#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">self</span>.equalToWithRelation(attribute, <span class="built_in">NSLayoutRelationEqual</span>);</div><div class="line">    &#125;;</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (MASConstraint * (^)(<span class="keyword">id</span>))greaterThanOrEqualTo &#123;</div><div class="line">    <span class="keyword">return</span> ^<span class="keyword">id</span>(<span class="keyword">id</span> attribute) &#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">self</span>.equalToWithRelation(attribute, <span class="built_in">NSLayoutRelationGreaterThanOrEqual</span>);</div><div class="line">    &#125;;</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (MASConstraint * (^)(<span class="keyword">id</span>))mas_greaterThanOrEqualTo &#123;</div><div class="line">    <span class="keyword">return</span> ^<span class="keyword">id</span>(<span class="keyword">id</span> attribute) &#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">self</span>.equalToWithRelation(attribute, <span class="built_in">NSLayoutRelationGreaterThanOrEqual</span>);</div><div class="line">    &#125;;</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (MASConstraint * (^)(<span class="keyword">id</span>))lessThanOrEqualTo &#123;</div><div class="line">    <span class="keyword">return</span> ^<span class="keyword">id</span>(<span class="keyword">id</span> attribute) &#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">self</span>.equalToWithRelation(attribute, <span class="built_in">NSLayoutRelationLessThanOrEqual</span>);</div><div class="line">    &#125;;</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (MASConstraint * (^)(<span class="keyword">id</span>))mas_lessThanOrEqualTo &#123;</div><div class="line">    <span class="keyword">return</span> ^<span class="keyword">id</span>(<span class="keyword">id</span> attribute) &#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">self</span>.equalToWithRelation(attribute, <span class="built_in">NSLayoutRelationLessThanOrEqual</span>);</div><div class="line">    &#125;;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h5 id="链式语法添加约束属性"><a href="#链式语法添加约束属性" class="headerlink" title="链式语法添加约束属性"></a>链式语法添加约束属性</h5><figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">- (MASConstraint *)addConstraintWithLayoutAttribute:(<span class="built_in">NSLayoutAttribute</span>)layoutAttribute &#123;</div><div class="line">    <span class="built_in">NSAssert</span>(!<span class="keyword">self</span>.hasLayoutRelation, <span class="string">@"Attributes should be chained before defining the constraint relation"</span>);</div><div class="line"></div><div class="line">    <span class="keyword">return</span> [<span class="keyword">self</span>.delegate constraint:<span class="keyword">self</span> addConstraintWithLayoutAttribute:layoutAttribute];</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h5 id="生成约束到视图"><a href="#生成约束到视图" class="headerlink" title="生成约束到视图"></a>生成约束到视图</h5><p>MASViewConstraint通过install方法生成约束，在该方法中首先会检测约束是否已经生成过约束或者约束未被激活，如果未生成过约束，会创建约束，如果需要更新约束的值，则查找View视图上已存在的<code>MASLayoutConstraint</code>，更新该值，如果是新创建，则直接将约束添加到视图上。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div></pre></td><td class="code"><pre><div class="line">- (<span class="keyword">void</span>)install &#123;</div><div class="line">    <span class="keyword">if</span> (<span class="keyword">self</span>.hasBeenInstalled) &#123;</div><div class="line">        <span class="keyword">return</span>;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="keyword">if</span> ([<span class="keyword">self</span> supportsActiveProperty] &amp;&amp; <span class="keyword">self</span>.layoutConstraint) &#123;</div><div class="line">        <span class="keyword">self</span>.layoutConstraint.active = <span class="literal">YES</span>;</div><div class="line">        [<span class="keyword">self</span>.firstViewAttribute.view.mas_installedConstraints addObject:<span class="keyword">self</span>];</div><div class="line">        <span class="keyword">return</span>;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    MAS_VIEW *firstLayoutItem = <span class="keyword">self</span>.firstViewAttribute.item;</div><div class="line">    <span class="built_in">NSLayoutAttribute</span> firstLayoutAttribute = <span class="keyword">self</span>.firstViewAttribute.layoutAttribute;</div><div class="line">    MAS_VIEW *secondLayoutItem = <span class="keyword">self</span>.secondViewAttribute.item;</div><div class="line">    <span class="built_in">NSLayoutAttribute</span> secondLayoutAttribute = <span class="keyword">self</span>.secondViewAttribute.layoutAttribute;</div><div class="line"></div><div class="line">    <span class="comment">// alignment attributes must have a secondViewAttribute</span></div><div class="line">    <span class="comment">// therefore we assume that is refering to superview</span></div><div class="line">    <span class="comment">// eg make.left.equalTo(@10)</span></div><div class="line">    <span class="keyword">if</span> (!<span class="keyword">self</span>.firstViewAttribute.isSizeAttribute &amp;&amp; !<span class="keyword">self</span>.secondViewAttribute) &#123;</div><div class="line">        secondLayoutItem = <span class="keyword">self</span>.firstViewAttribute.view.superview;</div><div class="line">        secondLayoutAttribute = firstLayoutAttribute;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    MASLayoutConstraint *layoutConstraint</div><div class="line">        = [MASLayoutConstraint constraintWithItem:firstLayoutItem</div><div class="line">                                        attribute:firstLayoutAttribute</div><div class="line">                                        relatedBy:<span class="keyword">self</span>.layoutRelation</div><div class="line">                                           toItem:secondLayoutItem</div><div class="line">                                        attribute:secondLayoutAttribute</div><div class="line">                                       multiplier:<span class="keyword">self</span>.layoutMultiplier</div><div class="line">                                         constant:<span class="keyword">self</span>.layoutConstant];</div><div class="line">    </div><div class="line">    layoutConstraint.priority = <span class="keyword">self</span>.layoutPriority;</div><div class="line">    layoutConstraint.mas_key = <span class="keyword">self</span>.mas_key;</div><div class="line">    </div><div class="line">    <span class="keyword">if</span> (<span class="keyword">self</span>.secondViewAttribute.view) &#123;</div><div class="line">        MAS_VIEW *closestCommonSuperview = [<span class="keyword">self</span>.firstViewAttribute.view mas_closestCommonSuperview:<span class="keyword">self</span>.secondViewAttribute.view];</div><div class="line">        <span class="built_in">NSAssert</span>(closestCommonSuperview,</div><div class="line">                 <span class="string">@"couldn't find a common superview for %@ and %@"</span>,</div><div class="line">                 <span class="keyword">self</span>.firstViewAttribute.view, <span class="keyword">self</span>.secondViewAttribute.view);</div><div class="line">        <span class="keyword">self</span>.installedView = closestCommonSuperview;</div><div class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">self</span>.firstViewAttribute.isSizeAttribute) &#123;</div><div class="line">        <span class="keyword">self</span>.installedView = <span class="keyword">self</span>.firstViewAttribute.view;</div><div class="line">    &#125; <span class="keyword">else</span> &#123;</div><div class="line">        <span class="keyword">self</span>.installedView = <span class="keyword">self</span>.firstViewAttribute.view.superview;</div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line">    MASLayoutConstraint *existingConstraint = <span class="literal">nil</span>;</div><div class="line">    <span class="keyword">if</span> (<span class="keyword">self</span>.updateExisting) &#123;</div><div class="line">        existingConstraint = [<span class="keyword">self</span> layoutConstraintSimilarTo:layoutConstraint];</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">if</span> (existingConstraint) &#123;</div><div class="line">        <span class="comment">// just update the constant</span></div><div class="line">        existingConstraint.constant = layoutConstraint.constant;</div><div class="line">        <span class="keyword">self</span>.layoutConstraint = existingConstraint;</div><div class="line">    &#125; <span class="keyword">else</span> &#123;</div><div class="line">        [<span class="keyword">self</span>.installedView addConstraint:layoutConstraint];</div><div class="line">        <span class="keyword">self</span>.layoutConstraint = layoutConstraint;</div><div class="line">        [firstLayoutItem.mas_installedConstraints addObject:<span class="keyword">self</span>];</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h5 id="更新约束及动画"><a href="#更新约束及动画" class="headerlink" title="更新约束及动画"></a>更新约束及动画</h5><p>Masonry通过调用View的<code>mas_updateConstraints</code>方法更新其当前约束，如果放在View的animation方法中还会产生动画效果。在<code>mas_updateConstraints</code>方法中，更新的方法会查找view上所有已经安装的约束。<br>查找方法如下：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">- (MASLayoutConstraint *)layoutConstraintSimilarTo:(MASLayoutConstraint *)layoutConstraint &#123;</div><div class="line">    <span class="comment">// check if any constraints are the same apart from the only mutable property constant</span></div><div class="line"></div><div class="line">    <span class="comment">// go through constraints in reverse as we do not want to match auto-resizing or interface builder constraints</span></div><div class="line">    <span class="comment">// and they are likely to be added first.</span></div><div class="line">    <span class="keyword">for</span> (<span class="built_in">NSLayoutConstraint</span> *existingConstraint <span class="keyword">in</span> <span class="keyword">self</span>.installedView.constraints.reverseObjectEnumerator) &#123;</div><div class="line">        <span class="keyword">if</span> (![existingConstraint isKindOfClass:MASLayoutConstraint.class]) <span class="keyword">continue</span>;</div><div class="line">        <span class="keyword">if</span> (existingConstraint.firstItem != layoutConstraint.firstItem) <span class="keyword">continue</span>;</div><div class="line">        <span class="keyword">if</span> (existingConstraint.secondItem != layoutConstraint.secondItem) <span class="keyword">continue</span>;</div><div class="line">        <span class="keyword">if</span> (existingConstraint.firstAttribute != layoutConstraint.firstAttribute) <span class="keyword">continue</span>;</div><div class="line">        <span class="keyword">if</span> (existingConstraint.secondAttribute != layoutConstraint.secondAttribute) <span class="keyword">continue</span>;</div><div class="line">        <span class="keyword">if</span> (existingConstraint.relation != layoutConstraint.relation) <span class="keyword">continue</span>;</div><div class="line">        <span class="keyword">if</span> (existingConstraint.multiplier != layoutConstraint.multiplier) <span class="keyword">continue</span>;</div><div class="line">        <span class="keyword">if</span> (existingConstraint.priority != layoutConstraint.priority) <span class="keyword">continue</span>;</div><div class="line"></div><div class="line">        <span class="keyword">return</span> (<span class="keyword">id</span>)existingConstraint;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="literal">nil</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>看到上面的判定方法可以知道确认是哪个<code>NSLayoutConstraint</code>对象,需要对比6个属性，包括等同关系以及优先级几个选项，所以在做动画更新时，需要保证需要update的约束仅仅是值不同，约束关系及优先等级等属性需要相同，同时由于生成约束后仅仅是更新了约束值的相关信息，并没有更新View的实际状态，这时候需要手动去调用<code>setNeedsUpdateConstraints</code>方法来显示通知系统约束更新。<br>例如：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">[img mas_makeConstraints:^(MASConstraintMaker *make) &#123;</div><div class="line">      make.centerX.equalTo(<span class="keyword">self</span>.view).offset(<span class="number">0</span>);</div><div class="line">      make.bottom.equalTo(<span class="keyword">self</span>.view).offset(<span class="number">0</span>);</div><div class="line">  &#125;];</div><div class="line"><span class="keyword">self</span>.icon = img;</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">  [<span class="built_in">UIView</span> animateWithDuration:<span class="number">3.0</span>f</div><div class="line">                            delay:<span class="number">0.25</span></div><div class="line">           usingSpringWithDamping:<span class="number">0.8</span></div><div class="line">            initialSpringVelocity:<span class="number">0.6</span></div><div class="line">                          options:<span class="built_in">UIViewAnimationOptionCurveLinear</span>|</div><div class="line">                                  <span class="built_in">UIViewAnimationOptionLayoutSubviews</span></div><div class="line">                       animations:^&#123;</div><div class="line">                          [<span class="keyword">self</span>.icon mas_remakeConstraints:^(MASConstraintMaker *make) &#123;</div><div class="line">                              make.centerX.equalTo(<span class="keyword">self</span>.view).offset(<span class="number">0</span>);</div><div class="line">                              make.top.equalTo(<span class="keyword">self</span>.view).offset(<span class="number">150</span>);</div><div class="line">                          &#125;];</div><div class="line">                           <span class="keyword">self</span>.icon.alpha = <span class="number">1.0</span>f;</div><div class="line">          [<span class="keyword">self</span>.view setNeedsUpdateConstraints];</div><div class="line">      &#125; completion:^(<span class="built_in">BOOL</span> finished) &#123;</div><div class="line">          </div><div class="line">      &#125;];</div></pre></td></tr></table></figure>
+<p>上面的方法可以保证仅更新已有约束并产生动画。如果需要更新的约束并不存在于原有的视图中，可以考虑调用<code>remakeConstraints</code>方法将所有约束都重新产生，同样也可以产生动画效果。</p>
+<h4 id="MASComposisteConstraint"><a href="#MASComposisteConstraint" class="headerlink" title="MASComposisteConstraint"></a>MASComposisteConstraint</h4><p><code>MASComposisteConstraint</code>是一组<code>MASViewConstraint</code>,实现了<code>MASConstraint</code>中的抽象方法。<code>MASComposisteConstraint</code>中的方法与<code>MASViewConstraint</code>方法类似，这里不做过多重复介绍。</p>
+<h3 id="MASViewAttribute"><a href="#MASViewAttribute" class="headerlink" title="MASViewAttribute"></a>MASViewAttribute</h3><p><code>MASViewAttribute</code>可以理解为NSLayoutAttribute约束属性的封装类。<br>提供了两个初始化方法：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">- (<span class="keyword">id</span>)initWithView:(MAS_VIEW *)view layoutAttribute:(<span class="built_in">NSLayoutAttribute</span>)layoutAttribute;</div><div class="line"><span class="comment">/**</span></div><div class="line"> *  默认初始化方式</div><div class="line"> */</div><div class="line">- (<span class="keyword">id</span>)initWithView:(MAS_VIEW *)view item:(<span class="keyword">id</span>)item layoutAttribute:(<span class="built_in">NSLayoutAttribute</span>)layoutAttribute;</div></pre></td></tr></table></figure>
+<p><code>MASViewAttribute</code>包含有三个对象:约束视图对象、关联视图对象和约束关系，定义如下:</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">MASViewAttribute</span> : <span class="title">NSObject</span></span></div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">weak</span>, <span class="keyword">readonly</span>) MAS_VIEW *view;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">weak</span>, <span class="keyword">readonly</span>) <span class="keyword">id</span> item;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">assign</span>, <span class="keyword">readonly</span>) <span class="built_in">NSLayoutAttribute</span> layoutAttribute;</div><div class="line">...</div><div class="line"><span class="keyword">@end</span></div></pre></td></tr></table></figure>
+<p><code>MASViewAttribute</code>提供了一个判断是否为大小约束属性的方法</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">- (<span class="built_in">BOOL</span>)isSizeAttribute &#123;</div><div class="line">    <span class="keyword">return</span> <span class="keyword">self</span>.layoutAttribute == <span class="built_in">NSLayoutAttributeWidth</span></div><div class="line">        || <span class="keyword">self</span>.layoutAttribute == <span class="built_in">NSLayoutAttributeHeight</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>判断等同性</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">- (<span class="built_in">BOOL</span>)isEqual:(MASViewAttribute *)viewAttribute &#123;</div><div class="line">    <span class="keyword">if</span> ([viewAttribute isKindOfClass:<span class="keyword">self</span>.class]) &#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">self</span>.view == viewAttribute.view</div><div class="line">            &amp;&amp; <span class="keyword">self</span>.layoutAttribute == viewAttribute.layoutAttribute;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> [<span class="keyword">super</span> isEqual:viewAttribute];</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (<span class="built_in">NSUInteger</span>)hash &#123;</div><div class="line">    <span class="keyword">return</span> MAS_NSUINTROTATE([<span class="keyword">self</span>.view hash], MAS_NSUINT_BIT / <span class="number">2</span>) ^ <span class="keyword">self</span>.layoutAttribute;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="MASConstraintMaker"><a href="#MASConstraintMaker" class="headerlink" title="MASConstraintMaker"></a>MASConstraintMaker</h3><p><code>MASConstraintMaker</code>是约束的管家,保管着需要添加约束的View视图，以及约束对象<code>MASConstraint</code>。Masonry的核心类之一。<br><code>MASConstraintMaker</code>是我们可以直接产生约束的类，在使用View的Category方法时会通过block的参数传递给我们一个新的Maker。</p>
+<p>下面的源码可以看出，通过View的<code>mas_makeConstraints</code>方法生成了一个新的maker传递出来，并在内部执行block代码块，通过install方法执行添加约束。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">- (<span class="built_in">NSArray</span> *)mas_makeConstraints:(<span class="keyword">void</span>(^)(MASConstraintMaker *))block &#123;</div><div class="line">    <span class="keyword">self</span>.translatesAutoresizingMaskIntoConstraints = <span class="literal">NO</span>;</div><div class="line">    MASConstraintMaker *constraintMaker = [[MASConstraintMaker alloc] initWithView:<span class="keyword">self</span>];</div><div class="line">    block(constraintMaker);</div><div class="line">    <span class="keyword">return</span> [constraintMaker install];</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<blockquote>
+<p>通过该段源码我们可以知道该block是在主线程中执行的(因为调用mas_make的方法在主线程调用),不涉及异步的问题，而且在执行完成后block被释放掉，并没有对象持有该block，所以不存在循环引用的问题。看到很多人在block的处理时用到了weakself这种写法，完全没有必要。</p>
+</blockquote>
+<h4 id="初始化方法"><a href="#初始化方法" class="headerlink" title="初始化方法"></a>初始化方法</h4><p><code>- (id)initWithView:(MAS_VIEW *)view;</code>方法会产生一个新的Maker，其内部会关联相关的view，并创建一个保存<code>MASConstraint</code>约束的数组。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">- (<span class="keyword">id</span>)initWithView:(MAS_VIEW *)view &#123;</div><div class="line">    <span class="keyword">self</span> = [<span class="keyword">super</span> init];</div><div class="line">    <span class="keyword">if</span> (!<span class="keyword">self</span>) <span class="keyword">return</span> <span class="literal">nil</span>;</div><div class="line">    </div><div class="line">    <span class="keyword">self</span>.view = view;</div><div class="line">    <span class="keyword">self</span>.constraints = <span class="built_in">NSMutableArray</span>.new;</div><div class="line">    </div><div class="line">    <span class="keyword">return</span> <span class="keyword">self</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="将多个MASConstraint合并"><a href="#将多个MASConstraint合并" class="headerlink" title="将多个MASConstraint合并"></a>将多个MASConstraint合并</h4><p><code>- (MASConstraint *(^)(dispatch_block_t group))group</code>方法可以将多个maker中的多个约束合并为一个约束。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">- (MASConstraint *(^)(dispatch_block_t group))group &#123;</div><div class="line">    <span class="keyword">return</span> ^<span class="keyword">id</span>(dispatch_block_t group) &#123;</div><div class="line">        <span class="built_in">NSInteger</span> previousCount = <span class="keyword">self</span>.constraints.count;</div><div class="line">        group();</div><div class="line"></div><div class="line">        <span class="built_in">NSArray</span> *children = [<span class="keyword">self</span>.constraints subarrayWithRange:<span class="built_in">NSMakeRange</span>(previousCount, <span class="keyword">self</span>.constraints.count - previousCount)];</div><div class="line">        MASCompositeConstraint *constraint = [[MASCompositeConstraint alloc] initWithChildren:children];</div><div class="line">        constraint.delegate = <span class="keyword">self</span>;</div><div class="line">        <span class="keyword">return</span> constraint;</div><div class="line">    &#125;;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="为视图生成约束"><a href="#为视图生成约束" class="headerlink" title="为视图生成约束"></a>为视图生成约束</h4><p>生成新的约束前需要移除掉所有已存在的约束，所以首先检查maker是否需要移除约束(remakeConstraints方法中会将该值set为YES)，如果需要，会先将已经存在的约束从View上移除掉，然后将自己所管理的<code>MASConstraint</code>产生<code>NSLayoutConstraint</code>对象添加到View中，最后移除自身所管理的所有<code>MASConstraint</code>,并返回<code>MASConstraint</code>数组。<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">- (<span class="built_in">NSArray</span> *)install &#123;</div><div class="line">    <span class="keyword">if</span> (<span class="keyword">self</span>.removeExisting) &#123;</div><div class="line">        <span class="built_in">NSArray</span> *installedConstraints = [MASViewConstraint installedConstraintsForView:<span class="keyword">self</span>.view];</div><div class="line">        <span class="keyword">for</span> (MASConstraint *constraint <span class="keyword">in</span> installedConstraints) &#123;</div><div class="line">            [constraint uninstall];</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="built_in">NSArray</span> *constraints = <span class="keyword">self</span>.constraints.copy;</div><div class="line">    <span class="keyword">for</span> (MASConstraint *constraint <span class="keyword">in</span> constraints) &#123;</div><div class="line">        constraint.updateExisting = <span class="keyword">self</span>.updateExisting;</div><div class="line">        [constraint install];</div><div class="line">    &#125;</div><div class="line">    [<span class="keyword">self</span>.constraints removeAllObjects];</div><div class="line">    <span class="keyword">return</span> constraints;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h4 id="链式语法"><a href="#链式语法" class="headerlink" title="链式语法"></a>链式语法</h4><p>因为Maker支持链式语法，所以支持链式语法的方法都应返回一个<code>MASViewConstraint</code>或其子类对象。<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">make.top.equalTo(<span class="keyword">self</span>.mas_topLayoutGuide);</div><div class="line">make.left.equalTo(<span class="keyword">self</span>.view);</div></pre></td></tr></table></figure></p>
+<p>maker中支持链式语法的方法很多，这里只列出一部分，并对一部分进行分析，其他的同理。</p>
+<h5 id="产生单一约束条件"><a href="#产生单一约束条件" class="headerlink" title="产生单一约束条件"></a>产生单一约束条件</h5><figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>, <span class="keyword">readonly</span>) MASConstraint *left;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>, <span class="keyword">readonly</span>) MASConstraint *top;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>, <span class="keyword">readonly</span>) MASConstraint *right;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>, <span class="keyword">readonly</span>) MASConstraint *bottom;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>, <span class="keyword">readonly</span>) MASConstraint *leading;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>, <span class="keyword">readonly</span>) MASConstraint *trailing;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>, <span class="keyword">readonly</span>) MASConstraint *width;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>, <span class="keyword">readonly</span>) MASConstraint *height;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>, <span class="keyword">readonly</span>) MASConstraint *centerX;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>, <span class="keyword">readonly</span>) MASConstraint *centerY;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>, <span class="keyword">readonly</span>) MASConstraint *baseline;</div></pre></td></tr></table></figure>
+<p>每次调用类似于top、left等单一约束的链式语法，maker都会先创建一个<code>MASViewAttribute</code>约束属性类，再通过约束属性类生成一个新的<code>MASViewConstraint</code>约束类，如果原约束不存在于<code>constraint</code>数组中，就会把该对象进去，如果存在就将该并且为<code>MASViewConstraint</code>,<br>就创建一个新的<code>MASComposisteConstraint</code>对象，并替换掉原来持有的对象。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">- (MASConstraint *)constraint:(MASConstraint *)constraint addConstraintWithLayoutAttribute:(<span class="built_in">NSLayoutAttribute</span>)layoutAttribute &#123;</div><div class="line">    MASViewAttribute *viewAttribute = [[MASViewAttribute alloc] initWithView:<span class="keyword">self</span>.view layoutAttribute:layoutAttribute];</div><div class="line">    MASViewConstraint *newConstraint = [[MASViewConstraint alloc] initWithFirstViewAttribute:viewAttribute];</div><div class="line">    <span class="keyword">if</span> ([constraint isKindOfClass:MASViewConstraint.class]) &#123;</div><div class="line">        <span class="comment">//replace with composite constraint</span></div><div class="line">        <span class="built_in">NSArray</span> *children = @[constraint, newConstraint];</div><div class="line">        MASCompositeConstraint *compositeConstraint = [[MASCompositeConstraint alloc] initWithChildren:children];</div><div class="line">        compositeConstraint.delegate = <span class="keyword">self</span>;</div><div class="line">        [<span class="keyword">self</span> constraint:constraint shouldBeReplacedWithConstraint:compositeConstraint];</div><div class="line">        <span class="keyword">return</span> compositeConstraint;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">if</span> (!constraint) &#123;</div><div class="line">        newConstraint.delegate = <span class="keyword">self</span>;</div><div class="line">        [<span class="keyword">self</span>.constraints addObject:newConstraint];</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> newConstraint;</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (<span class="keyword">void</span>)constraint:(MASConstraint *)constraint shouldBeReplacedWithConstraint:(MASConstraint *)replacementConstraint &#123;</div><div class="line">    <span class="built_in">NSUInteger</span> index = [<span class="keyword">self</span>.constraints indexOfObject:constraint];</div><div class="line">    <span class="built_in">NSAssert</span>(index != <span class="built_in">NSNotFound</span>, <span class="string">@"Could not find constraint %@"</span>, constraint);</div><div class="line">    [<span class="keyword">self</span>.constraints replaceObjectAtIndex:index withObject:replacementConstraint];</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>需要注意的是，当我们第一次调用<code>make.&lt;#单一属性#&gt;</code>方法时，maker会生成一个<code>MASViewConstraint</code>对象，并将约束添加到数组中，同时<code>MASViewConstraint</code>的代理会设置为maker,当调用一连串的链式语法时,由于<code>MASViewConstraint</code>的.<br>&lt;#单一属性方法#&gt;会调用自身的<code>addConstraintWithLayoutAttribute</code>方法，该方法会也会走上面的两个方法，所以将单一的’MASViewConstraint’转化为<code>MASComposisteConstraint</code>对象，并替换掉原来数组中存放的<code>MASViewConstraint</code>对象。</p>
+<h5 id="多个约束条件"><a href="#多个约束条件" class="headerlink" title="多个约束条件"></a>多个约束条件</h5><figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>, <span class="keyword">readonly</span>) MASConstraint *size;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>, <span class="keyword">readonly</span>) MASConstraint *edges;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>, <span class="keyword">readonly</span>) MASConstraint *(^attributes)(MASAttribute attrs);</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>, <span class="keyword">readonly</span>) MASConstraint *center;</div></pre></td></tr></table></figure>
+<p>对于size，edge，center属性，需要添加多个约束条件，所以会直接创建<code>MASComposisteConstraint</code>约束类，以edges为例：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line">- (MASConstraint *)edges &#123;</div><div class="line">    <span class="keyword">return</span> [<span class="keyword">self</span> addConstraintWithAttributes:MASAttributeTop | MASAttributeLeft | MASAttributeRight | MASAttributeBottom];</div><div class="line">&#125;</div><div class="line">- (MASConstraint *)addConstraintWithAttributes:(MASAttribute)attrs &#123;</div><div class="line">    __unused MASAttribute anyAttribute = (MASAttributeLeft | MASAttributeRight | MASAttributeTop | MASAttributeBottom | MASAttributeLeading</div><div class="line">                                          | MASAttributeTrailing | MASAttributeWidth | MASAttributeHeight | MASAttributeCenterX</div><div class="line">                                          | MASAttributeCenterY | MASAttributeBaseline</div><div class="line">                                          <span class="built_in">NSAssert</span>((attrs &amp; anyAttribute) != <span class="number">0</span>, <span class="string">@"You didn't pass any attribute to make.attributes(...)"</span>);</div><div class="line">    </div><div class="line">    <span class="built_in">NSMutableArray</span> *attributes = [<span class="built_in">NSMutableArray</span> array];</div><div class="line">    </div><div class="line">    <span class="keyword">if</span> (attrs &amp; MASAttributeLeft) [attributes addObject:<span class="keyword">self</span>.view.mas_left];</div><div class="line">    <span class="keyword">if</span> (attrs &amp; MASAttributeRight) [attributes addObject:<span class="keyword">self</span>.view.mas_right];</div><div class="line">    <span class="keyword">if</span> (attrs &amp; MASAttributeTop) [attributes addObject:<span class="keyword">self</span>.view.mas_top];</div><div class="line">    <span class="keyword">if</span> (attrs &amp; MASAttributeBottom) [attributes addObject:<span class="keyword">self</span>.view.mas_bottom];</div><div class="line">    <span class="keyword">if</span> (attrs &amp; MASAttributeLeading) [attributes addObject:<span class="keyword">self</span>.view.mas_leading];</div><div class="line">    <span class="keyword">if</span> (attrs &amp; MASAttributeTrailing) [attributes addObject:<span class="keyword">self</span>.view.mas_trailing];</div><div class="line">    <span class="keyword">if</span> (attrs &amp; MASAttributeWidth) [attributes addObject:<span class="keyword">self</span>.view.mas_width];</div><div class="line">    <span class="keyword">if</span> (attrs &amp; MASAttributeHeight) [attributes addObject:<span class="keyword">self</span>.view.mas_height];</div><div class="line">    <span class="keyword">if</span> (attrs &amp; MASAttributeCenterX) [attributes addObject:<span class="keyword">self</span>.view.mas_centerX];</div><div class="line">    <span class="keyword">if</span> (attrs &amp; MASAttributeCenterY) [attributes addObject:<span class="keyword">self</span>.view.mas_centerY];</div><div class="line">    <span class="keyword">if</span> (attrs &amp; MASAttributeBaseline) [attributes addObject:<span class="keyword">self</span>.view.mas_baseline];</div><div class="line"><span class="comment">//...省略了一些代码</span></div><div class="line">    <span class="built_in">NSMutableArray</span> *children = [<span class="built_in">NSMutableArray</span> arrayWithCapacity:attributes.count];</div><div class="line">    </div><div class="line">    <span class="keyword">for</span> (MASViewAttribute *a <span class="keyword">in</span> attributes) &#123;</div><div class="line">        [children addObject:[[MASViewConstraint alloc] initWithFirstViewAttribute:a]];</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    MASCompositeConstraint *constraint = [[MASCompositeConstraint alloc] initWithChildren:children];</div><div class="line">    constraint.delegate = <span class="keyword">self</span>;</div><div class="line">    [<span class="keyword">self</span>.constraints addObject:constraint];</div><div class="line">    <span class="keyword">return</span> constraint;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>上面的方法会直接创建一个<code>MASComposisteConstraint</code>类，并添加到constrains数组中。</p>
+<h3 id="MASLayoutConstraint及NSLayoutConstraint-MASDebugAdditions"><a href="#MASLayoutConstraint及NSLayoutConstraint-MASDebugAdditions" class="headerlink" title="MASLayoutConstraint及NSLayoutConstraint+MASDebugAdditions"></a>MASLayoutConstraint及NSLayoutConstraint+MASDebugAdditions</h3><p><code>MASLayoutConstraint</code>继承自<code>NSLayoutConstraint</code>,其主要作用是用来调试。NSLayoutConstraint+MASDebugAdditions中定义了约束的一些描述信息，比起<code>NSLayoutConstraint</code>调试起来确实方便不少。</p>
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><p>以上便是Masonry源码核心部分的剖析，总结或理解的的可能并不全，希望大家都能有所收获。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS/" rel="tag"># iOS</a>
+          
+            <a href="/tags/开源框架/" rel="tag"># 开源框架</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/06/05/Xcode中的环境变量/" rel="next" title="Xcode中的环境变量">
+                <i class="fa fa-chevron-left"></i> Xcode中的环境变量
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="Reddick" />
+          <p class="site-author-name" itemprop="name">Reddick</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">51</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#简介"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么选择Masonry"><span class="nav-number">2.</span> <span class="nav-text">为什么选择Masonry</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Masonry的使用"><span class="nav-number">3.</span> <span class="nav-text">Masonry的使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Masonry的结构"><span class="nav-number">4.</span> <span class="nav-text">Masonry的结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#View-MASAdditions"><span class="nav-number">4.1.</span> <span class="nav-text">View+MASAdditions</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#View-MASShorthandAdditions"><span class="nav-number">4.2.</span> <span class="nav-text">View+MASShorthandAdditions</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ViewController-MASAdditions"><span class="nav-number">4.3.</span> <span class="nav-text">ViewController+MASAdditions</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NSArray-MASAdditions"><span class="nav-number">4.4.</span> <span class="nav-text">NSArray+MASAdditions</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MASConstraint-约束抽象类"><span class="nav-number">4.5.</span> <span class="nav-text">MASConstraint 约束抽象类</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#MASViewConstraint"><span class="nav-number">4.5.1.</span> <span class="nav-text">MASViewConstraint</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#获取一个View视图对象上的所有MASConstraint约束"><span class="nav-number">4.5.1.1.</span> <span class="nav-text">获取一个View视图对象上的所有MASConstraint约束</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#MASViewConstraint的私有属性"><span class="nav-number">4.5.1.2.</span> <span class="nav-text">MASViewConstraint的私有属性</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#判断是否为激活状态，对应于NSLayoutConstraint的active属性"><span class="nav-number">4.5.1.3.</span> <span class="nav-text">判断是否为激活状态，对应于NSLayoutConstraint的active属性</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#是否已经存在"><span class="nav-number">4.5.1.4.</span> <span class="nav-text">是否已经存在</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#等分方式layoutMultiplier，对应于NSLayoutConstraint的multiplier属性"><span class="nav-number">4.5.1.5.</span> <span class="nav-text">等分方式layoutMultiplier，对应于NSLayoutConstraint的multiplier属性</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#优先级"><span class="nav-number">4.5.1.6.</span> <span class="nav-text">优先级</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#约束关系-lt-gt-…"><span class="nav-number">4.5.1.7.</span> <span class="nav-text">约束关系( \==,<=,>== …)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#链式语法添加约束属性"><span class="nav-number">4.5.1.8.</span> <span class="nav-text">链式语法添加约束属性</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#生成约束到视图"><span class="nav-number">4.5.1.9.</span> <span class="nav-text">生成约束到视图</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#更新约束及动画"><span class="nav-number">4.5.1.10.</span> <span class="nav-text">更新约束及动画</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#MASComposisteConstraint"><span class="nav-number">4.5.2.</span> <span class="nav-text">MASComposisteConstraint</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MASViewAttribute"><span class="nav-number">4.6.</span> <span class="nav-text">MASViewAttribute</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MASConstraintMaker"><span class="nav-number">4.7.</span> <span class="nav-text">MASConstraintMaker</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#初始化方法"><span class="nav-number">4.7.1.</span> <span class="nav-text">初始化方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#将多个MASConstraint合并"><span class="nav-number">4.7.2.</span> <span class="nav-text">将多个MASConstraint合并</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#为视图生成约束"><span class="nav-number">4.7.3.</span> <span class="nav-text">为视图生成约束</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#链式语法"><span class="nav-number">4.7.4.</span> <span class="nav-text">链式语法</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#产生单一约束条件"><span class="nav-number">4.7.4.1.</span> <span class="nav-text">产生单一约束条件</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#多个约束条件"><span class="nav-number">4.7.4.2.</span> <span class="nav-text">多个约束条件</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MASLayoutConstraint及NSLayoutConstraint-MASDebugAdditions"><span class="nav-number">4.8.</span> <span class="nav-text">MASLayoutConstraint及NSLayoutConstraint+MASDebugAdditions</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结语"><span class="nav-number">5.</span> <span class="nav-text">结语</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Reddick</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("Ol4oMp1FneQ7gWrMKhYQLsFq-gzGzoHsz", "H57pffrWdrCIfFwrTaa4lwln");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
