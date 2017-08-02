@@ -1,0 +1,882 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="google-site-verification" content="NeTdZhGK6vi-W-fSpXVdSlfNQxHkZUzcjoDUnNyoLDw" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="iOS,模型解析," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="简介Mantl与JSONModel类似，也是一款用于简化模型第三方库，其使用方法与JSONModel类似，本文会简要介绍其使用方法，注意事项，以及其实现原理。 JSON模型化Mantle同JSONModel一样，也是侵入式模型解析，使用时需要模型继承自MTLModel。 单一模型解析12345678910&amp;#123;    &quot;name&quot;: &quot;json&quot;,    &quot;value&quot;: &quot;value&quot;,">
+<meta name="keywords" content="iOS,模型解析">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS-Mantle源码浅析">
+<meta property="og:url" content="http://reddick-wang.github.io/2017/08/01/iOS-mantle源码浅析/index.html">
+<meta property="og:site_name" content="Reddick">
+<meta property="og:description" content="简介Mantl与JSONModel类似，也是一款用于简化模型第三方库，其使用方法与JSONModel类似，本文会简要介绍其使用方法，注意事项，以及其实现原理。 JSON模型化Mantle同JSONModel一样，也是侵入式模型解析，使用时需要模型继承自MTLModel。 单一模型解析12345678910&amp;#123;    &quot;name&quot;: &quot;json&quot;,    &quot;value&quot;: &quot;value&quot;,">
+<meta property="og:updated_time" content="2017-08-02T07:09:51.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="iOS-Mantle源码浅析">
+<meta name="twitter:description" content="简介Mantl与JSONModel类似，也是一款用于简化模型第三方库，其使用方法与JSONModel类似，本文会简要介绍其使用方法，注意事项，以及其实现原理。 JSON模型化Mantle同JSONModel一样，也是侵入式模型解析，使用时需要模型继承自MTLModel。 单一模型解析12345678910&amp;#123;    &quot;name&quot;: &quot;json&quot;,    &quot;value&quot;: &quot;value&quot;,">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"hide","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://reddick-wang.github.io/2017/08/01/iOS-mantle源码浅析/"/>
+
+
+
+
+
+  <title>iOS-Mantle源码浅析 | Reddick</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Reddick</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-sitemap">
+          <a href="/sitemap.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            站点地图
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://reddick-wang.github.io/2017/08/01/iOS-mantle源码浅析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Reddick">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Reddick">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">iOS-Mantle源码浅析</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-01T15:08:31+08:00">
+                2017-08-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2017/08/01/iOS-mantle源码浅析/" class="leancloud_visitors" data-flag-title="iOS-Mantle源码浅析">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>Mantl与JSONModel类似，也是一款用于简化模型第三方库，其使用方法与JSONModel类似，本文会简要介绍其使用方法，注意事项，以及其实现原理。</p>
+<h3 id="JSON模型化"><a href="#JSON模型化" class="headerlink" title="JSON模型化"></a>JSON模型化</h3><p>Mantle同JSONModel一样，也是侵入式模型解析，使用时需要模型继承自MTLModel。</p>
+<h4 id="单一模型解析"><a href="#单一模型解析" class="headerlink" title="单一模型解析"></a>单一模型解析</h4><figure class="highlight json"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">    <span class="attr">"name"</span>: <span class="string">"json"</span>,</div><div class="line">    <span class="attr">"value"</span>: <span class="string">"value"</span>,</div><div class="line">    <span class="attr">"usage"</span>: <span class="string">"anywhere"</span>,</div><div class="line">    <span class="attr">"type"</span>: [</div><div class="line">        <span class="string">"array"</span>,</div><div class="line">        <span class="string">"string"</span>,</div><div class="line">        <span class="string">"bool"</span></div><div class="line">    ]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>Mantle仅提供了对字典的解析方式，所以需要我们先将json字符串转换为字典。然后才能进行模型解析.</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">PDJsonModel</span> : <span class="title">MTLModel</span></span>&#123;</div><div class="line"></div><div class="line">&#125;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">copy</span>) <span class="built_in">NSString</span> *name;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">copy</span>) <span class="built_in">NSString</span> *value;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">copy</span>) <span class="built_in">NSString</span> *usage;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) <span class="built_in">NSMutableArray</span>  *type;</div><div class="line"><span class="keyword">@end</span></div></pre></td></tr></table></figure>
+<p>使用时直接调用<br><code>PDJsonModel *model = [[PDJsonModel alloc] initWithDictionary:dictionary error:&amp;error ];</code>便可以完成模型转换。</p>
+<h4 id="字典映射"><a href="#字典映射" class="headerlink" title="字典映射"></a>字典映射</h4><p>对于需要改变映射的属性名，需要模型实现<code>MTLJSONSerializing</code>协议，同时，调用的方法也发生了改变。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">    <span class="attr">"name"</span>: <span class="string">"json"</span>,</div><div class="line">    <span class="attr">"value"</span>: <span class="string">"value"</span>,</div><div class="line">    <span class="attr">"usage"</span>: <span class="string">"anywhere"</span>,</div><div class="line">    <span class="attr">"type"</span>: [</div><div class="line">        <span class="string">"array"</span>,</div><div class="line">        <span class="string">"string"</span>,</div><div class="line">        <span class="string">"bool"</span></div><div class="line">    ],</div><div class="line"><span class="attr">"identifier"</span>:<span class="string">"id"</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>对应的模型类</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">PDJsonModel</span> : <span class="title">MTLModel</span>&lt;<span class="title">MTLJSONSerializing</span>&gt;</span>&#123;</div><div class="line"></div><div class="line">&#125;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">copy</span>) <span class="built_in">NSString</span> *identifier;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">copy</span>) <span class="built_in">NSString</span> *name;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">copy</span>) <span class="built_in">NSString</span> *value;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">copy</span>) <span class="built_in">NSString</span> *usage;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) <span class="built_in">NSMutableArray</span>  *type;</div><div class="line"><span class="keyword">@end</span></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">PDJsonModel</span> </span></div><div class="line"></div><div class="line">+  (<span class="built_in">NSDictionary</span> *)JSONKeyPathsByPropertyKey &#123;</div><div class="line">    <span class="keyword">return</span> @&#123;<span class="string">@"name"</span>:<span class="string">@"name"</span>,</div><div class="line">             <span class="string">@"value"</span>:<span class="string">@"value"</span>,</div><div class="line">             <span class="string">@"usage"</span>:<span class="string">@"usage"</span>,</div><div class="line">             <span class="string">@"type"</span>:<span class="string">@"type"</span>,</div><div class="line">             <span class="string">@"identifier"</span>:<span class="string">@"id"</span></div><div class="line">             &#125;;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">@end</span></div></pre></td></tr></table></figure>
+<p>使用MTLAdapter类构建模型时，<code>JSONKeyPathsByPropertyKey</code>方法中的字段如果未指定，即便JSON中存在值，也不会赋值。</p>
+<h4 id="嵌套模型"><a href="#嵌套模型" class="headerlink" title="嵌套模型"></a>嵌套模型</h4><figure class="highlight json"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">    <span class="attr">"name"</span>: <span class="string">"json"</span>,</div><div class="line">    <span class="attr">"value"</span>: <span class="string">"value"</span>,</div><div class="line">    <span class="attr">"usage"</span>: <span class="string">"anywhere"</span>,</div><div class="line">    <span class="attr">"type"</span>: [</div><div class="line">        <span class="string">"array"</span>,</div><div class="line">        <span class="string">"string"</span>,</div><div class="line">        <span class="string">"bool"</span></div><div class="line">    ],</div><div class="line"><span class="attr">"id"</span>:<span class="string">"id"</span>,</div><div class="line"> <span class="attr">"user"</span>:&#123;<span class="attr">"name"</span>:<span class="string">"user"</span>,<span class="attr">"password"</span>:<span class="string">"password"</span>&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">@class</span> <span class="title">UserModel</span>;</span></div><div class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">PDJsonModel</span> : <span class="title">MTLModel</span>&lt;<span class="title">MTLJSONSerializing</span>&gt;</span>&#123;</div><div class="line"></div><div class="line">&#125;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">copy</span>) <span class="built_in">NSString</span> *identifier;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">copy</span>) <span class="built_in">NSString</span> *name;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">copy</span>) <span class="built_in">NSString</span> *value;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">copy</span>) <span class="built_in">NSString</span> *usage;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) <span class="built_in">NSMutableArray</span>  *type;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) UserModel *user;</div><div class="line"><span class="keyword">@end</span></div><div class="line"></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">UserModel</span> : <span class="title">MTLModel</span> &lt;<span class="title">MTLJSONSerializing</span>&gt;</span></div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>,<span class="keyword">copy</span>)<span class="built_in">NSString</span> *name;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>,<span class="keyword">copy</span>)<span class="built_in">NSString</span> *password;</div><div class="line"><span class="keyword">@end</span></div><div class="line"></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">PDJsonModel</span></span></div><div class="line">+  (<span class="built_in">NSDictionary</span> *)JSONKeyPathsByPropertyKey &#123;</div><div class="line">    <span class="keyword">return</span> @&#123;<span class="string">@"name"</span>:<span class="string">@"name"</span>,</div><div class="line">             <span class="string">@"value"</span>:<span class="string">@"value"</span>,</div><div class="line">             <span class="string">@"usage"</span>:<span class="string">@"usage"</span>,</div><div class="line">             <span class="string">@"type"</span>:<span class="string">@"type"</span>,</div><div class="line">             <span class="string">@"identifier"</span>:<span class="string">@"id"</span>,</div><div class="line">             <span class="string">@"user"</span>:<span class="string">@"user"</span></div><div class="line">             &#125;;</div><div class="line">&#125;</div><div class="line"></div><div class="line">+ (<span class="built_in">NSValueTransformer</span> *)userTransformer &#123;</div><div class="line">    <span class="keyword">return</span> [<span class="built_in">MTLJSONAdapter</span> dictionaryTransformerWithModelClass:[UserModel <span class="keyword">class</span>]];</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">@end</span></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">UserModel</span></span></div><div class="line"></div><div class="line">+ (<span class="built_in">NSDictionary</span> *)JSONKeyPathsByPropertyKey &#123;</div><div class="line">    <span class="keyword">return</span> @&#123;<span class="string">@"name"</span>:<span class="string">@"name"</span>,</div><div class="line">             <span class="string">@"password"</span>:<span class="string">@"password"</span>&#125;;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">@end</span></div></pre></td></tr></table></figure>
+<h4 id="嵌套模型数组"><a href="#嵌套模型数组" class="headerlink" title="嵌套模型数组"></a>嵌套模型数组</h4><figure class="highlight json"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">    <span class="attr">"name"</span>: <span class="string">"json"</span>,</div><div class="line">    <span class="attr">"value"</span>: <span class="string">"value"</span>,</div><div class="line">    <span class="attr">"usage"</span>: <span class="string">"anywhere"</span>,</div><div class="line">    <span class="attr">"type"</span>: [</div><div class="line">        <span class="string">"array"</span>,</div><div class="line">        <span class="string">"string"</span>,</div><div class="line">        <span class="string">"bool"</span></div><div class="line">    ],</div><div class="line">    <span class="attr">"id"</span>: <span class="string">"value"</span>,</div><div class="line">    <span class="attr">"users"</span>: [</div><div class="line">        &#123;</div><div class="line">            <span class="attr">"name"</span>: <span class="string">"user1"</span>,</div><div class="line">            <span class="attr">"password"</span>: <span class="string">"password"</span></div><div class="line">        &#125;,</div><div class="line">        &#123;</div><div class="line">            <span class="attr">"name"</span>: <span class="string">"user2"</span>,</div><div class="line">            <span class="attr">"password"</span>: <span class="string">"password2"</span></div><div class="line">        &#125;</div><div class="line">    ]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>对应模型类</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">@class</span> <span class="title">UserModel</span>;</span></div><div class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">PDJsonModel</span> : <span class="title">MTLModel</span>&lt;<span class="title">MTLJSONSerializing</span>&gt;</span>&#123;</div><div class="line"></div><div class="line">&#125;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">copy</span>) <span class="built_in">NSString</span> *identifier;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">copy</span>) <span class="built_in">NSString</span> *name;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">copy</span>) <span class="built_in">NSString</span> *value;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">copy</span>) <span class="built_in">NSString</span> *usage;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) <span class="built_in">NSMutableArray</span>  *type;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">copy</span>) <span class="built_in">NSArray</span>&lt;UserModel *&gt; *users;</div><div class="line"><span class="keyword">@end</span></div><div class="line"></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">UserModel</span> : <span class="title">MTLModel</span> &lt;<span class="title">MTLJSONSerializing</span>&gt;</span></div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>,<span class="keyword">copy</span>)<span class="built_in">NSString</span> *name;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>,<span class="keyword">copy</span>)<span class="built_in">NSString</span> *password;</div><div class="line"><span class="keyword">@end</span></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">PDJsonModel</span></span></div><div class="line">+  (<span class="built_in">NSDictionary</span> *)JSONKeyPathsByPropertyKey &#123;</div><div class="line">    <span class="keyword">return</span> @&#123;<span class="string">@"name"</span>:<span class="string">@"name"</span>,</div><div class="line">             <span class="string">@"value"</span>:<span class="string">@"value"</span>,</div><div class="line">             <span class="string">@"usage"</span>:<span class="string">@"usage"</span>,</div><div class="line">             <span class="string">@"type"</span>:<span class="string">@"type"</span>,</div><div class="line">             <span class="string">@"identifier"</span>:<span class="string">@"id"</span>,</div><div class="line">             <span class="string">@"users"</span>:<span class="string">@"users"</span></div><div class="line">             &#125;;</div><div class="line">&#125;</div><div class="line"></div><div class="line">+ (<span class="built_in">NSValueTransformer</span> *)usersTransformer &#123;</div><div class="line">    <span class="keyword">return</span> [<span class="built_in">MTLJSONAdapter</span> arrayTransformerWithModelClass:UserModel.class];</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">@end</span></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">UserModel</span></span></div><div class="line"></div><div class="line">+ (<span class="built_in">NSDictionary</span> *)JSONKeyPathsByPropertyKey &#123;</div><div class="line">    <span class="keyword">return</span> @&#123;<span class="string">@"name"</span>:<span class="string">@"name"</span>,</div><div class="line">             <span class="string">@"password"</span>:<span class="string">@"password"</span>&#125;;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">@end</span></div></pre></td></tr></table></figure>
+<h4 id="自定义转换类型"><a href="#自定义转换类型" class="headerlink" title="自定义转换类型"></a>自定义转换类型</h4><p>对于特殊类型的属性如NSDate等，可以使用<code>MTLValueTransformer</code>类进行变换。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">[<span class="built_in">MTLValueTransformer</span> transformerUsingForwardBlock:^<span class="keyword">id</span>(<span class="built_in">NSString</span> *timeIntervalSince1970, <span class="built_in">BOOL</span> *success, <span class="built_in">NSError</span> *__autoreleasing *error) &#123;</div><div class="line">        <span class="built_in">NSTimeInterval</span> timeInterval = [timeIntervalSince1970 doubleValue];</div><div class="line">        <span class="built_in">NSDate</span> *date = [<span class="built_in">NSDate</span> dateWithTimeIntervalSince1970:timeInterval];</div><div class="line">        <span class="keyword">return</span> date;</div><div class="line">    &#125; reverseBlock:^<span class="keyword">id</span>(<span class="built_in">NSDate</span> *date, <span class="built_in">BOOL</span> *success, <span class="built_in">NSError</span> *__autoreleasing *error) &#123;</div><div class="line">        <span class="built_in">NSTimeInterval</span> timeInterval = date.timeIntervalSince1970;</div><div class="line">        <span class="keyword">return</span> @(timeInterval).stringValue;</div><div class="line">    &#125;];</div></pre></td></tr></table></figure>
+<h4 id="多态形式类型"><a href="#多态形式类型" class="headerlink" title="多态形式类型"></a>多态形式类型</h4><p>可以调用<code>classForParsingJSONDictionary</code>方法，指定某类解析时转化为其子类解析。来自官方的例子：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">XYMessage</span> : <span class="title">MTLModel</span></span></div><div class="line"></div><div class="line"><span class="keyword">@end</span></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">XYTextMessage</span>: <span class="title">XYMessage</span></span></div><div class="line"></div><div class="line"><span class="keyword">@property</span> (<span class="keyword">readonly</span>, <span class="keyword">nonatomic</span>, <span class="keyword">copy</span>) <span class="built_in">NSString</span> *body;</div><div class="line"></div><div class="line"><span class="keyword">@end</span></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">XYPictureMessage</span> : <span class="title">XYMessage</span></span></div><div class="line"></div><div class="line"><span class="keyword">@property</span> (<span class="keyword">readonly</span>, <span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) <span class="built_in">NSURL</span> *imageURL;</div><div class="line"></div><div class="line"><span class="keyword">@end</span></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">XYMessage</span></span></div><div class="line"></div><div class="line">+ (Class)classForParsingJSONDictionary:(<span class="built_in">NSDictionary</span> *)JSONDictionary &#123;</div><div class="line">    <span class="keyword">if</span> (JSONDictionary[<span class="string">@"image_url"</span>] != <span class="literal">nil</span>) &#123;</div><div class="line">        <span class="keyword">return</span> XYPictureMessage.class;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (JSONDictionary[<span class="string">@"body"</span>] != <span class="literal">nil</span>) &#123;</div><div class="line">        <span class="keyword">return</span> XYTextMessage.class;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="built_in">NSAssert</span>(<span class="literal">NO</span>, <span class="string">@"No matching class for the JSON dictionary '%@'."</span>, JSONDictionary);</div><div class="line">    <span class="keyword">return</span> <span class="keyword">self</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">@end</span></div><div class="line"><span class="comment">//解析</span></div><div class="line"><span class="built_in">NSDictionary</span> *textMessage = @&#123;</div><div class="line">    <span class="string">@"id"</span>: @<span class="number">1</span>,</div><div class="line">    <span class="string">@"body"</span>: <span class="string">@"Hello World!"</span></div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="built_in">NSDictionary</span> *pictureMessage = @&#123;</div><div class="line">    <span class="string">@"id"</span>: @<span class="number">2</span>,</div><div class="line">    <span class="string">@"image_url"</span>: <span class="string">@"http://example.com/lolcat.gif"</span></div><div class="line">&#125;;</div><div class="line"></div><div class="line">XYTextMessage *messageA = [<span class="built_in">MTLJSONAdapter</span> modelOfClass:XYMessage.class fromJSONDictionary:textMessage error:<span class="literal">NULL</span>];</div><div class="line"></div><div class="line">XYPictureMessage *messageB = [<span class="built_in">MTLJSONAdapter</span> modelOfClass:XYMessage.class fromJSONDictionary:pictureMessage error:<span class="literal">NULL</span>];</div></pre></td></tr></table></figure></p>
+<p>以上便是对于Mantle使用上的介绍。</p>
+<h3 id="持久化存储"><a href="#持久化存储" class="headerlink" title="持久化存储"></a>持久化存储</h3><p>Mantle并没有实现持久化存储的方法，不过其实现了归档与解归档的方法。</p>
+<h3 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h3><ul>
+<li><code>(instancetype)initWithDictionary:(NSDictionary *)dictionary error:(NSError **)error</code>方法不支持字典映射.</li>
+<li>对于json中存在的null，Mantle会自动过滤掉。</li>
+<li>对于有继承关系的类，Mantle并不能直接解析父类的属性映射，需要手动包含父类的属性。方式如下(重点在<code>JSONKeyPathsByPropertyKey</code>方法)：</li>
+</ul>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">    <span class="attr">"name"</span>: <span class="string">"json"</span>,</div><div class="line">    <span class="attr">"value"</span>: <span class="string">"value"</span>,</div><div class="line">    <span class="attr">"usage"</span>: <span class="string">"anywhere"</span>,</div><div class="line">    <span class="attr">"type"</span>: [</div><div class="line">        <span class="string">"array"</span>,</div><div class="line">        <span class="string">"string"</span>,</div><div class="line">        <span class="string">"bool"</span></div><div class="line">    ],</div><div class="line">    <span class="attr">"id"</span>: <span class="string">"value"</span>,</div><div class="line">    <span class="attr">"users"</span>: [</div><div class="line">        &#123;</div><div class="line">            <span class="attr">"name"</span>: <span class="string">"user1"</span>,</div><div class="line">            <span class="attr">"password"</span>: <span class="string">"password"</span></div><div class="line">        &#125;,</div><div class="line">        &#123;</div><div class="line">            <span class="attr">"name"</span>: <span class="string">"user2"</span>,</div><div class="line">            <span class="attr">"password"</span>: <span class="string">"password2"</span></div><div class="line">        &#125;</div><div class="line">    ]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">PDBaseModel</span> : <span class="title">MTLModel</span>&lt;<span class="title">MTLJSONSerializing</span>&gt;</span></div><div class="line"><span class="keyword">@property</span>  (<span class="keyword">nonatomic</span>, <span class="keyword">copy</span>) <span class="built_in">NSString</span> *identifier;</div><div class="line"></div><div class="line"><span class="keyword">@end</span></div><div class="line"></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">PDBaseModel</span></span></div><div class="line">+ (<span class="built_in">NSDictionary</span> *)JSONKeyPathsByPropertyKey &#123;</div><div class="line">    <span class="keyword">return</span> @&#123;<span class="string">@"identifier"</span>:<span class="string">@"id"</span>&#125;;</div><div class="line">&#125;</div><div class="line"><span class="keyword">@end</span></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">@class</span> <span class="title">UserModel</span>;</span></div><div class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">PDJsonModel</span> : <span class="title">PDBaseModel</span>&lt;<span class="title">MTLJSONSerializing</span>&gt;</span>&#123;</div><div class="line"></div><div class="line">&#125;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">copy</span>) <span class="built_in">NSString</span> *name;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">copy</span>) <span class="built_in">NSString</span> *value;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">copy</span>) <span class="built_in">NSString</span> *usage;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) <span class="built_in">NSMutableArray</span>  *type;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">copy</span>) <span class="built_in">NSArray</span>&lt;UserModel *&gt; *users;</div><div class="line"><span class="keyword">@end</span></div><div class="line"></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">UserModel</span> : <span class="title">MTLModel</span> &lt;<span class="title">MTLJSONSerializing</span>&gt;</span></div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>,<span class="keyword">copy</span>)<span class="built_in">NSString</span> *name;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>,<span class="keyword">copy</span>)<span class="built_in">NSString</span> *password;</div><div class="line"><span class="keyword">@end</span></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">PDJsonModel</span></span></div><div class="line">+  (<span class="built_in">NSDictionary</span> *)JSONKeyPathsByPropertyKey &#123;</div><div class="line">    <span class="built_in">NSDictionary</span> *dict = @&#123;<span class="string">@"name"</span>:<span class="string">@"name"</span>,</div><div class="line">             <span class="string">@"value"</span>:<span class="string">@"value"</span>,</div><div class="line">             <span class="string">@"usage"</span>:<span class="string">@"usage"</span>,</div><div class="line">             <span class="string">@"type"</span>:<span class="string">@"type"</span>,</div><div class="line">             <span class="string">@"users"</span>:<span class="string">@"users"</span></div><div class="line">             &#125;;</div><div class="line">    </div><div class="line">    <span class="keyword">return</span> [dict mtl_dictionaryByAddingEntriesFromDictionary:[<span class="keyword">super</span> JSONKeyPathsByPropertyKey]];</div><div class="line">&#125;</div><div class="line"></div><div class="line">+ (<span class="built_in">NSValueTransformer</span> *)usersTransformer &#123;</div><div class="line">    <span class="keyword">return</span> [<span class="built_in">MTLJSONAdapter</span> arrayTransformerWithModelClass:UserModel.class];</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="源码解析"><a href="#源码解析" class="headerlink" title="源码解析"></a>源码解析</h3><p>在使用Mantle时我们已经发现了Mantle的核心，两类一协议：<code>MTLModel</code>,<code>MTLJSONAdapter</code>以及协议<code>MTLJSONSerializing</code></p>
+<h4 id="MTLModel"><a href="#MTLModel" class="headerlink" title="MTLModel"></a>MTLModel</h4><p>MTLModel的初始化方法为<code>- (instancetype)initWithDictionary:(NSDictionary *)dictionary error:(NSError **)error</code>。<br>默认初始化方法仍然调用了<code>init</code>方法，不过什么都没有做。接着会对dictionary中的数据进行处理，将NSNull类型置成nil。接着会调用<code>MTLValidateAndSetValue</code>方法进行数据填充。代码如下：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">- (<span class="keyword">instancetype</span>)initWithDictionary:(<span class="built_in">NSDictionary</span> *)dictionary error:(<span class="built_in">NSError</span> **)error &#123;</div><div class="line">	<span class="keyword">self</span> = [<span class="keyword">self</span> init];</div><div class="line">	<span class="keyword">if</span> (<span class="keyword">self</span> == <span class="literal">nil</span>) <span class="keyword">return</span> <span class="literal">nil</span>;</div><div class="line"></div><div class="line">	<span class="keyword">for</span> (<span class="built_in">NSString</span> *key <span class="keyword">in</span> dictionary) &#123;</div><div class="line">		<span class="comment">// Mark this as being autoreleased, because validateValue may return</span></div><div class="line">		<span class="comment">// a new object to be stored in this variable (and we don't want ARC to</span></div><div class="line">		<span class="comment">// double-free or leak the old or new values).</span></div><div class="line">		__autoreleasing <span class="keyword">id</span> value = [dictionary objectForKey:key];</div><div class="line"></div><div class="line">		<span class="keyword">if</span> ([value isEqual:<span class="built_in">NSNull</span>.null]) value = <span class="literal">nil</span>;</div><div class="line"></div><div class="line">		<span class="built_in">BOOL</span> success = <span class="built_in">MTLValidateAndSetValue</span>(<span class="keyword">self</span>, key, value, <span class="literal">YES</span>, error);</div><div class="line">		<span class="keyword">if</span> (!success) <span class="keyword">return</span> <span class="literal">nil</span>;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="keyword">return</span> <span class="keyword">self</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>在<code>MTLValidateAndSetValue</code>方法中会对value和key进行判断，如果满足条件，则直接进KVC赋值，如果有异常，则抛出返回。代码如下：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">static</span> <span class="built_in">BOOL</span> <span class="built_in">MTLValidateAndSetValue</span>(<span class="keyword">id</span> obj, <span class="built_in">NSString</span> *key, <span class="keyword">id</span> value, <span class="built_in">BOOL</span> forceUpdate, <span class="built_in">NSError</span> **error) &#123;</div><div class="line">	<span class="comment">// Mark this as being autoreleased, because validateValue may return</span></div><div class="line">	<span class="comment">// a new object to be stored in this variable (and we don't want ARC to</span></div><div class="line">	<span class="comment">// double-free or leak the old or new values).</span></div><div class="line">	__autoreleasing <span class="keyword">id</span> validatedValue = value;</div><div class="line"></div><div class="line">	<span class="keyword">@try</span> &#123;</div><div class="line">		<span class="keyword">if</span> (![obj validateValue:&amp;validatedValue forKey:key error:error]) <span class="keyword">return</span> <span class="literal">NO</span>;</div><div class="line"></div><div class="line">		<span class="keyword">if</span> (forceUpdate || value != validatedValue) &#123;</div><div class="line">			[obj setValue:validatedValue forKey:key];</div><div class="line">		&#125;</div><div class="line"></div><div class="line">		<span class="keyword">return</span> <span class="literal">YES</span>;</div><div class="line">	&#125; <span class="keyword">@catch</span> (<span class="built_in">NSException</span> *ex) &#123;</div><div class="line">		<span class="built_in">NSLog</span>(<span class="string">@"*** Caught exception setting key \"%@\" : %@"</span>, key, ex);</div><div class="line"></div><div class="line">		<span class="comment">// Fail fast in Debug builds.</span></div><div class="line">		<span class="meta">#if DEBUG</span></div><div class="line">		<span class="keyword">@throw</span> ex;</div><div class="line">		<span class="meta">#else</span></div><div class="line">		<span class="keyword">if</span> (error != <span class="literal">NULL</span>) &#123;</div><div class="line">			*error = [<span class="built_in">NSError</span> mtl_modelErrorWithException:ex];</div><div class="line">		&#125;</div><div class="line"></div><div class="line">		<span class="keyword">return</span> <span class="literal">NO</span>;</div><div class="line">		<span class="meta">#endif</span></div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>使用MTLModel的直接方式进行JSON转模型，其效率还是很高的。仅仅比KVC多了一步Null判断，不过功能也是最少的。</p>
+<h4 id="MTLJSONAdapter"><a href="#MTLJSONAdapter" class="headerlink" title="MTLJSONAdapter"></a>MTLJSONAdapter</h4><p>大多数情况下我们还是要使用<code>MTLJSONAdapter</code>进行模型转换,<code>MTLJSONAdapter</code>通过<code>+ (id)modelOfClass:(Class)modelClass fromJSONDictionary:(NSDictionary *)JSONDictionary error:(NSError **)error;</code>方法将字典转换为相应的模型，功能上比MTLModel支持的更多.<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line">- (<span class="keyword">id</span>)initWithModelClass:(Class)modelClass &#123;</div><div class="line">	<span class="built_in">NSParameterAssert</span>(modelClass != <span class="literal">nil</span>);</div><div class="line">	<span class="built_in">NSParameterAssert</span>([modelClass conformsToProtocol:<span class="class"><span class="keyword">@protocol</span>(<span class="title">MTLJSONSerializing</span>)]);</span></div><div class="line"></div><div class="line">	<span class="keyword">self</span> = [<span class="keyword">super</span> init];</div><div class="line">	<span class="keyword">if</span> (<span class="keyword">self</span> == <span class="literal">nil</span>) <span class="keyword">return</span> <span class="literal">nil</span>;</div><div class="line"></div><div class="line">	_modelClass = modelClass;</div><div class="line">    <span class="comment">//获取映射的keypath</span></div><div class="line">	_JSONKeyPathsByPropertyKey = [modelClass JSONKeyPathsByPropertyKey];</div><div class="line">    <span class="comment">//获取类的属性列表</span></div><div class="line">	<span class="built_in">NSSet</span> *propertyKeys = [<span class="keyword">self</span>.modelClass propertyKeys];</div><div class="line">    <span class="comment">//查找对应的键是否为属性名，不存在则返回。</span></div><div class="line">	<span class="keyword">for</span> (<span class="built_in">NSString</span> *mappedPropertyKey <span class="keyword">in</span> _JSONKeyPathsByPropertyKey) &#123;</div><div class="line">		<span class="keyword">if</span> (![propertyKeys containsObject:mappedPropertyKey]) &#123;</div><div class="line">			<span class="built_in">NSAssert</span>(<span class="literal">NO</span>, <span class="string">@"%@ is not a property of %@."</span>, mappedPropertyKey, modelClass);</div><div class="line">			<span class="keyword">return</span> <span class="literal">nil</span>;</div><div class="line">		&#125;</div><div class="line">        <span class="comment">//获取对应键中的值是否合法</span></div><div class="line">		<span class="keyword">id</span> value = _JSONKeyPathsByPropertyKey[mappedPropertyKey];</div><div class="line">		<span class="keyword">if</span> ([value isKindOfClass:<span class="built_in">NSArray</span>.class]) &#123;</div><div class="line">			<span class="keyword">for</span> (<span class="built_in">NSString</span> *keyPath <span class="keyword">in</span> value) &#123;</div><div class="line">				<span class="keyword">if</span> ([keyPath isKindOfClass:<span class="built_in">NSString</span>.class]) <span class="keyword">continue</span>;</div><div class="line"></div><div class="line">				<span class="built_in">NSAssert</span>(<span class="literal">NO</span>, <span class="string">@"%@ must either map to a JSON key path or a JSON array of key paths, got: %@."</span>, mappedPropertyKey, value);</div><div class="line">				<span class="keyword">return</span> <span class="literal">nil</span>;</div><div class="line">			&#125;</div><div class="line">		&#125; <span class="keyword">else</span> <span class="keyword">if</span> (![value isKindOfClass:<span class="built_in">NSString</span>.class]) &#123;</div><div class="line">			<span class="built_in">NSAssert</span>(<span class="literal">NO</span>, <span class="string">@"%@ must either map to a JSON key path or a JSON array of key paths, got: %@."</span>,mappedPropertyKey, value);</div><div class="line">			<span class="keyword">return</span> <span class="literal">nil</span>;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">    <span class="comment">//查找出所有的自定义transformer的方法</span></div><div class="line">	_valueTransformersByPropertyKey = [<span class="keyword">self</span>.class valueTransformersForModelClass:modelClass];</div><div class="line">    <span class="comment">//命中缓存时有用。</span></div><div class="line">	_JSONAdaptersByModelClass = [<span class="built_in">NSMapTable</span> strongToStrongObjectsMapTable];</div><div class="line"></div><div class="line">	<span class="keyword">return</span> <span class="keyword">self</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>获取属性列表以及标记<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">+ (<span class="built_in">NSSet</span> *)propertyKeys &#123;</div><div class="line">	<span class="built_in">NSSet</span> *cachedKeys = objc_getAssociatedObject(<span class="keyword">self</span>, <span class="built_in">MTLModelCachedPropertyKeysKey</span>);</div><div class="line">	<span class="keyword">if</span> (cachedKeys != <span class="literal">nil</span>) <span class="keyword">return</span> cachedKeys;</div><div class="line"></div><div class="line">	<span class="built_in">NSMutableSet</span> *keys = [<span class="built_in">NSMutableSet</span> set];</div><div class="line"></div><div class="line">	[<span class="keyword">self</span> enumeratePropertiesUsingBlock:^(objc_property_t property, <span class="built_in">BOOL</span> *stop) &#123;</div><div class="line">		<span class="built_in">NSString</span> *key = @(property_getName(property));</div><div class="line"></div><div class="line">		<span class="keyword">if</span> ([<span class="keyword">self</span> storageBehaviorForPropertyWithKey:key] != <span class="built_in">MTLPropertyStorageNone</span>) &#123;</div><div class="line">			 [keys addObject:key];</div><div class="line">		&#125;</div><div class="line">	&#125;];</div><div class="line"></div><div class="line">	<span class="comment">// It doesn't really matter if we replace another thread's work, since we do</span></div><div class="line">	<span class="comment">// it atomically and the result should be the same.</span></div><div class="line">	objc_setAssociatedObject(<span class="keyword">self</span>, <span class="built_in">MTLModelCachedPropertyKeysKey</span>, keys, OBJC_ASSOCIATION_COPY);</div><div class="line"></div><div class="line">	<span class="keyword">return</span> keys;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>将objc_property_t转化为mtl_propertyAttributes结构体，判断其getter方法，setter方法是否存在，对于<code>dynamic</code>,<code>ivar</code>不存在，getter、setter类型不存在的属性不做解析，对于readonly类型也不做解析，其余类型返回<code>MTLPropertyStoragePermanent</code>枚举类型以便缓存属性信息。<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">+ (<span class="built_in">MTLPropertyStorage</span>)storageBehaviorForPropertyWithKey:(<span class="built_in">NSString</span> *)propertyKey &#123;</div><div class="line">	objc_property_t property = class_getProperty(<span class="keyword">self</span>.class, propertyKey.UTF8String);</div><div class="line"></div><div class="line">	<span class="keyword">if</span> (property == <span class="literal">NULL</span>) <span class="keyword">return</span> <span class="built_in">MTLPropertyStorageNone</span>;</div><div class="line"></div><div class="line">	mtl_propertyAttributes *attributes = mtl_copyPropertyAttributes(property);</div><div class="line">	@onExit &#123;</div><div class="line">		free(attributes);</div><div class="line">	&#125;;</div><div class="line">	</div><div class="line">	<span class="built_in">BOOL</span> hasGetter = [<span class="keyword">self</span> instancesRespondToSelector:attributes-&gt;<span class="keyword">getter</span>];</div><div class="line">	<span class="built_in">BOOL</span> hasSetter = [<span class="keyword">self</span> instancesRespondToSelector:attributes-&gt;<span class="keyword">setter</span>];</div><div class="line">	<span class="keyword">if</span> (!attributes-&gt;dynamic &amp;&amp; attributes-&gt;ivar == <span class="literal">NULL</span> &amp;&amp; !hasGetter &amp;&amp; !hasSetter) &#123;</div><div class="line">		<span class="keyword">return</span> <span class="built_in">MTLPropertyStorageNone</span>;</div><div class="line">	&#125; <span class="keyword">else</span> <span class="keyword">if</span> (attributes-&gt;<span class="keyword">readonly</span> &amp;&amp; attributes-&gt;ivar == <span class="literal">NULL</span>) &#123;</div><div class="line">		<span class="keyword">if</span> ([<span class="keyword">self</span> isEqual:<span class="built_in">MTLModel</span>.class]) &#123;</div><div class="line">			<span class="keyword">return</span> <span class="built_in">MTLPropertyStorageNone</span>;</div><div class="line">		&#125; <span class="keyword">else</span> &#123;</div><div class="line">			<span class="comment">// Check superclass in case the subclass redeclares a property that</span></div><div class="line">			<span class="comment">// falls through</span></div><div class="line">			<span class="keyword">return</span> [<span class="keyword">self</span>.superclass storageBehaviorForPropertyWithKey:propertyKey];</div><div class="line">		&#125;</div><div class="line">	&#125; <span class="keyword">else</span> &#123;</div><div class="line">		<span class="keyword">return</span> <span class="built_in">MTLPropertyStoragePermanent</span>;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h4 id="MTLJSONSerializing"><a href="#MTLJSONSerializing" class="headerlink" title="MTLJSONSerializing"></a>MTLJSONSerializing</h4><p><code>MTLJSONSerializing</code>继承自<code>MTLModel</code>协议，多了几个方法方便我们做自定义映射和转换。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">@protocol</span> <span class="title">MTLJSONSerializing</span> &lt;<span class="title">MTLModel</span>&gt;</span></div><div class="line"><span class="keyword">@required</span></div><div class="line">+ (<span class="built_in">NSDictionary</span> *)JSONKeyPathsByPropertyKey;</div><div class="line"><span class="keyword">@optional</span></div><div class="line">+ (<span class="built_in">NSValueTransformer</span> *)JSONTransformerForKey:(<span class="built_in">NSString</span> *)key;</div><div class="line">+ (Class)classForParsingJSONDictionary:(<span class="built_in">NSDictionary</span> *)JSONDictionary;</div></pre></td></tr></table></figure>
+<h2 id="完结"><a href="#完结" class="headerlink" title="完结"></a>完结</h2><p>以上便是对Mantle的JSON转模型部分的解析，对比与JSONModel其实现略复杂，同样是侵入式的模型解析，对于继承关系的处理不是很好，而且嵌套模型解析不是很友好。下面给出几个可以参考的链接。</p>
+<h3 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h3><p><a href="http://southpeak.github.io/2015/01/11/sourcecode-mantle/" target="_blank" rel="external">Mantle实现分析</a><br><a href="http://www.cocoachina.com/ios/20141016/9931.html" target="_blank" rel="external">为什么唱吧iOS 6.0选择了Mantle</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS/" rel="tag"># iOS</a>
+          
+            <a href="/tags/模型解析/" rel="tag"># 模型解析</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/07/31/iOS-JSONModel源码解析/" rel="next" title="JSONModel源码解析">
+                <i class="fa fa-chevron-left"></i> JSONModel源码解析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="Reddick" />
+          <p class="site-author-name" itemprop="name">Reddick</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">53</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#简介"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#JSON模型化"><span class="nav-number">1.1.</span> <span class="nav-text">JSON模型化</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#单一模型解析"><span class="nav-number">1.1.1.</span> <span class="nav-text">单一模型解析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#字典映射"><span class="nav-number">1.1.2.</span> <span class="nav-text">字典映射</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#嵌套模型"><span class="nav-number">1.1.3.</span> <span class="nav-text">嵌套模型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#嵌套模型数组"><span class="nav-number">1.1.4.</span> <span class="nav-text">嵌套模型数组</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#自定义转换类型"><span class="nav-number">1.1.5.</span> <span class="nav-text">自定义转换类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#多态形式类型"><span class="nav-number">1.1.6.</span> <span class="nav-text">多态形式类型</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#持久化存储"><span class="nav-number">1.2.</span> <span class="nav-text">持久化存储</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#注意事项"><span class="nav-number">1.3.</span> <span class="nav-text">注意事项</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#源码解析"><span class="nav-number">1.4.</span> <span class="nav-text">源码解析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#MTLModel"><span class="nav-number">1.4.1.</span> <span class="nav-text">MTLModel</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#MTLJSONAdapter"><span class="nav-number">1.4.2.</span> <span class="nav-text">MTLJSONAdapter</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#MTLJSONSerializing"><span class="nav-number">1.4.3.</span> <span class="nav-text">MTLJSONSerializing</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#完结"><span class="nav-number">2.</span> <span class="nav-text">完结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#参考链接"><span class="nav-number">2.1.</span> <span class="nav-text">参考链接</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Reddick</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("Ol4oMp1FneQ7gWrMKhYQLsFq-gzGzoHsz", "H57pffrWdrCIfFwrTaa4lwln");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
