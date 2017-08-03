@@ -95,17 +95,17 @@
 
 
 
-<meta name="description" content="简介Mantl与JSONModel类似，也是一款用于简化模型第三方库，其使用方法与JSONModel类似，本文会简要介绍其使用方法，注意事项，以及其实现原理。 JSON模型化Mantle同JSONModel一样，也是侵入式模型解析，使用时需要模型继承自MTLModel。 单一模型解析12345678910&amp;#123;    &quot;name&quot;: &quot;json&quot;,    &quot;value&quot;: &quot;value&quot;,">
+<meta name="description" content="简介Mantl与JSONModel类似，也是一款用于简化模型第三方库，其使用方法与JSONModel类似，本文会简要介绍其使用方法，注意事项，以及其实现原理。源码地址 JSON模型化Mantle同JSONModel一样，也是侵入式模型解析，使用时需要模型继承自MTLModel。 单一模型解析12345678910&amp;#123;    &quot;name&quot;: &quot;json&quot;,    &quot;value&quot;: &quot;valu">
 <meta name="keywords" content="iOS,模型解析">
 <meta property="og:type" content="article">
 <meta property="og:title" content="iOS-Mantle源码浅析">
 <meta property="og:url" content="http://reddick-wang.github.io/2017/08/01/iOS-mantle源码浅析/index.html">
 <meta property="og:site_name" content="Reddick">
-<meta property="og:description" content="简介Mantl与JSONModel类似，也是一款用于简化模型第三方库，其使用方法与JSONModel类似，本文会简要介绍其使用方法，注意事项，以及其实现原理。 JSON模型化Mantle同JSONModel一样，也是侵入式模型解析，使用时需要模型继承自MTLModel。 单一模型解析12345678910&amp;#123;    &quot;name&quot;: &quot;json&quot;,    &quot;value&quot;: &quot;value&quot;,">
-<meta property="og:updated_time" content="2017-08-02T07:09:51.000Z">
+<meta property="og:description" content="简介Mantl与JSONModel类似，也是一款用于简化模型第三方库，其使用方法与JSONModel类似，本文会简要介绍其使用方法，注意事项，以及其实现原理。源码地址 JSON模型化Mantle同JSONModel一样，也是侵入式模型解析，使用时需要模型继承自MTLModel。 单一模型解析12345678910&amp;#123;    &quot;name&quot;: &quot;json&quot;,    &quot;value&quot;: &quot;valu">
+<meta property="og:updated_time" content="2017-08-02T07:16:30.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iOS-Mantle源码浅析">
-<meta name="twitter:description" content="简介Mantl与JSONModel类似，也是一款用于简化模型第三方库，其使用方法与JSONModel类似，本文会简要介绍其使用方法，注意事项，以及其实现原理。 JSON模型化Mantle同JSONModel一样，也是侵入式模型解析，使用时需要模型继承自MTLModel。 单一模型解析12345678910&amp;#123;    &quot;name&quot;: &quot;json&quot;,    &quot;value&quot;: &quot;value&quot;,">
+<meta name="twitter:description" content="简介Mantl与JSONModel类似，也是一款用于简化模型第三方库，其使用方法与JSONModel类似，本文会简要介绍其使用方法，注意事项，以及其实现原理。源码地址 JSON模型化Mantle同JSONModel一样，也是侵入式模型解析，使用时需要模型继承自MTLModel。 单一模型解析12345678910&amp;#123;    &quot;name&quot;: &quot;json&quot;,    &quot;value&quot;: &quot;valu">
 
 
 
@@ -353,7 +353,7 @@
       
 
       
-        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>Mantl与JSONModel类似，也是一款用于简化模型第三方库，其使用方法与JSONModel类似，本文会简要介绍其使用方法，注意事项，以及其实现原理。</p>
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>Mantl与JSONModel类似，也是一款用于简化模型第三方库，其使用方法与JSONModel类似，本文会简要介绍其使用方法，注意事项，以及其实现原理。<a href="https://github.com/Mantle/Mantle" target="_blank" rel="external">源码地址</a></p>
 <h3 id="JSON模型化"><a href="#JSON模型化" class="headerlink" title="JSON模型化"></a>JSON模型化</h3><p>Mantle同JSONModel一样，也是侵入式模型解析，使用时需要模型继承自MTLModel。</p>
 <h4 id="单一模型解析"><a href="#单一模型解析" class="headerlink" title="单一模型解析"></a>单一模型解析</h4><figure class="highlight json"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">    <span class="attr">"name"</span>: <span class="string">"json"</span>,</div><div class="line">    <span class="attr">"value"</span>: <span class="string">"value"</span>,</div><div class="line">    <span class="attr">"usage"</span>: <span class="string">"anywhere"</span>,</div><div class="line">    <span class="attr">"type"</span>: [</div><div class="line">        <span class="string">"array"</span>,</div><div class="line">        <span class="string">"string"</span>,</div><div class="line">        <span class="string">"bool"</span></div><div class="line">    ]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>Mantle仅提供了对字典的解析方式，所以需要我们先将json字符串转换为字典。然后才能进行模型解析.</p>
@@ -447,6 +447,10 @@
 
           <div class="post-nav-prev post-nav-item">
             
+              <a href="/2017/08/02/iOS-YYModel源码解析/" rel="prev" title="iOS-YYModel源码浅析">
+                iOS-YYModel源码浅析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
           </div>
         </div>
       
@@ -517,7 +521,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">53</span>
+                <span class="site-state-item-count">54</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -539,7 +543,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-count">12</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
